@@ -1,0 +1,33 @@
+<view class="container">
+  <view class="header">
+    <text class="title">系统设置</text>
+  </view>
+  
+  <view class="content">
+    <view class="settings-section">
+      <text class="section-title">关于系统</text>
+      <view class="setting-item">
+        <text class="setting-label">版本号</text>
+        <text class="setting-value">1.0.0</text>
+      </view>
+      <view class="setting-item">
+        <text class="setting-label">开发团队</text>
+        <text class="setting-value">Inventory System Team</text>
+      </view>
+    </view>
+    
+    <view class="settings-section">
+      <text class="section-title">数据管理</text>
+      <button class="setting-btn" bindtap="clearCache">清除缓存</button>
+      <button class="setting-btn" type="warn" bindtap="syncData">同步数据</button>
+    </view>
+    
+    <view class="settings-section">
+      <text class="section-title">系统信息</text>
+      <view class="setting-item" wx:for="{{systemInfo}}" wx:key="key">
+        <text class="setting-label">{{item.key}}</text>
+        <text class="setting-value">{{item.value}}</text>
+      </view>
+    </view>
+  </view>
+</view>

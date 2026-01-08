@@ -1,0 +1,42 @@
+<!-- 商品管理页面 -->
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">商品管理</text>
+    <button class="btn-primary" bindtap="navigateToAddProduct">添加商品</button>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="products-list">
+    <block wx:if="{{loading}}">
+      <view class="loading">
+        <text>加载中...</text>
+      </view>
+    </block>
+    <block wx:elif="{{products.length === 0}}">
+      <view class="empty">
+        <text>暂无商品</text>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="product-item" wx:for="{{products}}" wx:key="id">
+        <view class="product-content">
+          <view class="product-header">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-code">{{item.code}}</text>
+          </view>
+          <view class="product-info">
+            <text>类别: {{item.category.name}}</text>
+          </view>
+          <view class="product-details">
+            <text>单价: ¥{{item.price}} | 库存: {{item.stock}}</text>
+          </view>
+          <text class="product-desc" wx:if="{{item.description}}">{{item.description}}</text>
+        </view>
+        <view class="product-actions">
+          <button class="action-btn btn-edit" bindtap="navigateToEditProduct" data-id="{{item.id}}">编辑</button>
+          <button class="action-btn btn-delete" bindtap="deleteProduct" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

@@ -1,0 +1,42 @@
+<view class="container">
+  <view class="header">
+    <text class="title">{{mode === 'add' ? '添加分类' : '编辑分类'}}</text>
+  </view>
+  
+  <view class="content">
+    <form class="category-form" bindsubmit="submitForm">
+      <view class="form-item">
+        <text class="label">分类名称</text>
+        <input 
+          class="input" 
+          name="name" 
+          placeholder="请输入分类名称" 
+          value="{{category.name}}" 
+          bindinput="onInputChange"
+          data-field="name"
+          required
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">分类描述</text>
+        <textarea 
+          class="textarea" 
+          name="description" 
+          placeholder="请输入分类描述" 
+          value="{{category.description}}" 
+          bindinput="onInputChange"
+          data-field="description"
+          auto-height
+        ></textarea>
+      </view>
+      
+      <view class="form-buttons">
+        <button class="cancel-btn" form-type="reset" bindtap="navigateBack">取消</button>
+        <button class="submit-btn" form-type="submit" loading="{{submitting}}">
+          {{mode === 'add' ? '添加分类' : '保存修改'}}
+        </button>
+      </view>
+    </form>
+  </view>
+</view>

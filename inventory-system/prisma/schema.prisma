@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../node_modules/.prisma/client"
+  generator = "client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 商品类别模型
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  products    Product[]
+}
+
+// 商品模型
+model Product {
+  id               Int              @id @default(autoincrement())
+  name             String
+  code             String           @unique
+  categoryId       Int
+  category         Category         @relation(fields: [categoryId], references: [id])
+  price            Decimal          @default(0.00)
+  stock            Int              @default(0)
+  description      String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  inRecords        InRecord[]
+  outRecords       OutRecord[]
+  inventoryChecks  InventoryCheck[]
+}
+
+// 客户模型
+model Customer {
+  id          Int      @id @default(autoincrement())
+  name        String
+  contact     String
+  phone       String
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  outRecords  OutRecord[]
+}
+
+// 供应商模型
+model Supplier {
+  id          Int      @id @default(autoincrement())
+  name        String
+  contact     String
+  phone       String
+  address     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  inRecords   InRecord[]
+}
+
+// 入库单模型
+model InRecord {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id])
+  supplierId  Int
+  supplier    Supplier @relation(fields: [supplierId], references: [id])
+  quantity    Int
+  price       Decimal
+  totalAmount Decimal  @default(0.00)
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 出库单模型
+model OutRecord {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id])
+  customerId  Int
+  customer    Customer @relation(fields: [customerId], references: [id])
+  quantity    Int
+  price       Decimal
+  totalAmount Decimal  @default(0.00)
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 库存盘点模型
+model InventoryCheck {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id])
+  actualStock Int
+  difference  Int
+  notes       String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// 系统设置模型
+model SystemSetting {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="header">
+    <text class="title">出库记录</text>
+    <button class="add-btn" bindtap="navigateToAddOutRecord">+ 添加出库</button>
+  </view>
+  
+  <view class="content">
+    <block wx:if="{{loading}}">
+      <view class="loading">加载中...</view>
+    </block>
+    <block wx:else>
+      <view class="records-list">
+        <view class="record-item" wx:for="{{outRecords}}" wx:key="id">
+          <view class="record-header">
+            <text class="record-id">记录ID: {{item.id}}</text>
+            <text class="record-date">{{new Date(item.date).toLocaleString()}}</text>
+          </view>
+          <view class="record-info">
+            <text class="record-product">商品: {{item.Product.name || '未知商品'}}</text>
+            <text class="record-quantity">数量: <text class="quantity-out">-{{item.quantity}}</text></text>
+            <text class="record-customer">客户: {{item.Customer.name || '未知客户'}}</text>
+            <text class="record-operator">操作员: {{item.operator}}</text>
+            <text class="record-note" wx:if="{{item.note}}">备注: {{item.note}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{outRecords.length === 0}}">
+        <text>暂无出库记录</text>
+      </view>
+    </block>
+  </view>
+</view>

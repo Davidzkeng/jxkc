@@ -1,0 +1,49 @@
+<!-- 商品编辑页面 -->
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">{{mode === 'add' ? '添加商品' : '编辑商品'}}</text>
+    <button class="btn-default" bindtap="navigateBack">取消</button>
+  </view>
+
+  <!-- 商品表单 -->
+  <form class="form" bindsubmit="handleSubmit">
+    <view class="form-item">
+      <text class="form-label">商品名称 *</text>
+      <input class="form-input" name="name" value="{{formData.name}}" placeholder="请输入商品名称" bindinput="handleInput" data-field="name" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品编码 *</text>
+      <input class="form-input" name="code" value="{{formData.code}}" placeholder="请输入商品编码" bindinput="handleInput" data-field="code" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品类别 *</text>
+      <picker class="form-select" mode="selector" range="{{categories}}" range-key="name" value="{{categoryIndex}}" bindchange="handleCategoryChange">
+        <view class="picker-text">{{selectedCategory.name || '请选择商品类别'}}</view>
+      </picker>
+      <input type="hidden" name="categoryId" value="{{formData.categoryId}}" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">单价 *</text>
+      <input class="form-input" type="digit" name="price" value="{{formData.price}}" placeholder="请输入单价" bindinput="handleInput" data-field="price" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">库存数量 *</text>
+      <input class="form-input" type="number" name="stock" value="{{formData.stock}}" placeholder="请输入库存数量" bindinput="handleInput" data-field="stock" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品描述</text>
+      <textarea class="form-input" name="description" value="{{formData.description}}" placeholder="请输入商品描述" bindinput="handleInput" data-field="description" auto-height style="height: 120rpx;" />
+    </view>
+
+    <view class="form-actions">
+      <button class="btn-primary" form-type="submit" loading="{{submitting}}">
+        {{mode === 'add' ? '创建' : '更新'}}
+      </button>
+    </view>
+  </form>
+</view>

@@ -1,0 +1,162 @@
+.app-layout {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+}
+
+.app-sider {
+  background: rgba(15, 15, 35, 0.9) !important;
+  border-right: 1px solid #2a2a4a;
+  min-width: 200px !important;
+}
+
+.app-menu {
+  background: transparent !important;
+}
+
+.app-menu .ant-menu-item {
+  color: #e2e8f0 !important;
+  transition: all 0.3s ease;
+}
+
+.app-menu .ant-menu-item:hover {
+  color: #6366f1 !important;
+  background: rgba(99, 102, 241, 0.1) !important;
+}
+
+.app-menu .ant-menu-item-selected {
+  color: #6366f1 !important;
+  background: rgba(99, 102, 241, 0.2) !important;
+  border-right: 3px solid #6366f1 !important;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  font-weight: bold;
+  margin: 0;
+}
+
+.logo h2 {
+  margin: 0;
+  font-size: 18px;
+  text-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+}
+
+.app-layout-main {
+  background: transparent !important;
+}
+
+.app-header {
+  background: rgba(26, 26, 46, 0.95) !important;
+  border-bottom: 1px solid #2a2a4a;
+  padding: 0 24px !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.app-content {
+  margin: 24px;
+  padding: 24px;
+  background: rgba(26, 26, 46, 0.9) !important;
+  border-radius: 12px;
+  border: 1px solid #2a2a4a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: #e2e8f0;
+}
+
+/* 全局样式 */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+  color: #e2e8f0;
+}
+
+/* 卡片样式 */
+.ant-card {
+  background: rgba(30, 30, 50, 0.8) !important;
+  border: 1px solid #2a2a4a !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.ant-card-head {
+  background: rgba(40, 40, 60, 0.8) !important;
+  border-bottom: 1px solid #2a2a4a !important;
+  color: #e2e8f0 !important;
+}
+
+/* 表格样式 */
+.ant-table {
+  background: rgba(30, 30, 50, 0.8) !important;
+  color: #e2e8f0 !important;
+}
+
+.ant-table-thead > tr > th {
+  background: rgba(40, 40, 60, 0.8) !important;
+  color: #e2e8f0 !important;
+  border-bottom: 1px solid #2a2a4a !important;
+}
+
+.ant-table-tbody > tr > td {
+  background: transparent !important;
+  color: #cbd5e1 !important;
+  border-bottom: 1px solid #2a2a4a !important;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* 按钮样式 */
+.ant-btn-primary {
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%) !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5) !important;
+}
+
+/* 输入框样式 */
+.ant-input,
+.ant-select-selector {
+  background: rgba(40, 40, 60, 0.8) !important;
+  border: 1px solid #2a2a4a !important;
+  color: #e2e8f0 !important;
+}
+
+.ant-input:focus,
+.ant-select-focused .ant-select-selector {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+}
+
+/* 标签页样式 */
+.ant-tabs {
+  color: #e2e8f0 !important;
+}
+
+.ant-tabs-nav {
+  border-bottom: 1px solid #2a2a4a !important;
+}
+
+.ant-tabs-tab {
+  color: #94a3b8 !important;
+}
+
+.ant-tabs-tab-active {
+  color: #6366f1 !important;
+}
+
+.ant-tabs-ink-bar {
+  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%) !important;
+}

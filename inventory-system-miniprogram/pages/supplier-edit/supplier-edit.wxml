@@ -1,0 +1,82 @@
+<view class="container">
+  <view class="header">
+    <text class="title">{{mode === 'add' ? '添加供应商' : '编辑供应商'}}</text>
+  </view>
+  
+  <view class="content">
+    <form class="supplier-form" bindsubmit="submitForm">
+      <view class="form-item">
+        <text class="label">供应商名称</text>
+        <input 
+          class="input" 
+          name="name" 
+          placeholder="请输入供应商名称" 
+          value="{{supplier.name}}" 
+          bindinput="onInputChange"
+          data-field="name"
+          required
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">联系人</text>
+        <input 
+          class="input" 
+          name="contactPerson" 
+          placeholder="请输入联系人姓名" 
+          value="{{supplier.contactPerson}}" 
+          bindinput="onInputChange"
+          data-field="contactPerson"
+          required
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">联系电话</text>
+        <input 
+          class="input" 
+          name="phone" 
+          placeholder="请输入联系电话" 
+          value="{{supplier.phone}}" 
+          bindinput="onInputChange"
+          data-field="phone"
+          type="number"
+          required
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">电子邮箱</text>
+        <input 
+          class="input" 
+          name="email" 
+          placeholder="请输入电子邮箱" 
+          value="{{supplier.email}}" 
+          bindinput="onInputChange"
+          data-field="email"
+          type="text"
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">联系地址</text>
+        <textarea 
+          class="textarea" 
+          name="address" 
+          placeholder="请输入联系地址" 
+          value="{{supplier.address}}" 
+          bindinput="onInputChange"
+          data-field="address"
+          auto-height
+        ></textarea>
+      </view>
+      
+      <view class="form-buttons">
+        <button class="cancel-btn" form-type="reset" bindtap="navigateBack">取消</button>
+        <button class="submit-btn" form-type="submit" loading="{{submitting}}">
+          {{mode === 'add' ? '添加供应商' : '保存修改'}}
+        </button>
+      </view>
+    </form>
+  </view>
+</view>

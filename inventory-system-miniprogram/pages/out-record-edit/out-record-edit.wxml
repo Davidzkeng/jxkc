@@ -1,0 +1,84 @@
+<view class="container">
+  <view class="header">
+    <text class="title">{{mode === 'add' ? '添加出库记录' : '编辑出库记录'}}</text>
+  </view>
+  
+  <view class="content">
+    <form class="record-form" bindsubmit="submitForm">
+      <view class="form-item">
+        <text class="label">选择商品</text>
+        <picker 
+          class="picker" 
+          mode="selector" 
+          range="{{products}}" 
+          range-key="name"
+          value="{{productIndex}}"
+          bindchange="onProductChange"
+        >
+          <view class="picker-text">{{products[productIndex].name || '请选择商品'}}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">数量</text>
+        <input 
+          class="input" 
+          name="quantity" 
+          placeholder="请输入出库数量" 
+          value="{{outRecord.quantity}}" 
+          bindinput="onInputChange"
+          data-field="quantity"
+          type="number"
+          required
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">选择客户</text>
+        <picker 
+          class="picker" 
+          mode="selector" 
+          range="{{customers}}" 
+          range-key="name"
+          value="{{customerIndex}}"
+          bindchange="onCustomerChange"
+        >
+          <view class="picker-text">{{customers[customerIndex].name || '请选择客户'}}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">操作员</text>
+        <input 
+          class="input" 
+          name="operator" 
+          placeholder="请输入操作员姓名" 
+          value="{{outRecord.operator}}" 
+          bindinput="onInputChange"
+          data-field="operator"
+          required
+        />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">备注</text>
+        <textarea 
+          class="textarea" 
+          name="note" 
+          placeholder="请输入备注信息" 
+          value="{{outRecord.note}}" 
+          bindinput="onInputChange"
+          data-field="note"
+          auto-height
+        ></textarea>
+      </view>
+      
+      <view class="form-buttons">
+        <button class="cancel-btn" form-type="reset" bindtap="navigateBack">取消</button>
+        <button class="submit-btn" form-type="submit" loading="{{submitting}}">
+          {{mode === 'add' ? '添加出库' : '保存修改'}}
+        </button>
+      </view>
+    </form>
+  </view>
+</view>
