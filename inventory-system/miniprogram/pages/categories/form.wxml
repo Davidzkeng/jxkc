@@ -1,0 +1,21 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="form">
+    <view class="form-item">
+      <text class="form-label">类别名称 *</text>
+      <input class="form-input" value="{{name}}" bindinput="onNameChange" placeholder="请输入类别名称" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">类别描述</text>
+      <textarea class="form-textarea" value="{{description}}" bindinput="onDescriptionChange" placeholder="请输入类别描述" maxlength="200" />
+    </view>
+
+    <view class="form-actions">
+      <button class="submit-btn" loading="{{submitLoading}}" bindtap="submit">保存</button>
+    </view>
+  </view>
+</view>

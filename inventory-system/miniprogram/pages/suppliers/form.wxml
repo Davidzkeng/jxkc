@@ -1,0 +1,31 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="form">
+    <view class="form-item">
+      <text class="form-label">供应商名称 *</text>
+      <input class="form-input" value="{{name}}" bindinput="onNameChange" placeholder="请输入供应商名称" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">联系人 *</text>
+      <input class="form-input" value="{{contact}}" bindinput="onContactChange" placeholder="请输入联系人" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">电话 *</text>
+      <input class="form-input" type="number" value="{{phone}}" bindinput="onPhoneChange" placeholder="请输入电话" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">地址</text>
+      <textarea class="form-textarea" value="{{address}}" bindinput="onAddressChange" placeholder="请输入地址" maxlength="200" />
+    </view>
+
+    <view class="form-actions">
+      <button class="submit-btn" loading="{{submitLoading}}" bindtap="submit">保存</button>
+    </view>
+  </view>
+</view>

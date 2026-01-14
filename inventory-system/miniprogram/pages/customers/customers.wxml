@@ -1,0 +1,44 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else>
+    <view wx:if="{{customers.length === 0}}" class="empty-state">
+      <text class="empty-icon">👥</text>
+      <text>暂无客户</text>
+    </view>
+
+    <view wx:else class="customer-list">
+      <view
+        class="customer-card"
+        wx:for="{{customers}}"
+        wx:key="id"
+      >
+        <view class="customer-header">
+          <text class="customer-name">{{item.name}}</text>
+        </view>
+        <view class="customer-body">
+          <view class="customer-row">
+            <text class="label">联系人:</text>
+            <text class="value">{{item.contact}}</text>
+          </view>
+          <view class="customer-row">
+            <text class="label">电话:</text>
+            <text class="value">{{item.phone}}</text>
+          </view>
+          <view wx:if="{{item.address}}" class="customer-row">
+            <text class="label">地址:</text>
+            <text class="value">{{item.address}}</text>
+          </view>
+        </view>
+        <view class="customer-actions">
+          <button class="action-btn edit" bindtap="navigateToEdit" data-id="{{item.id}}">编辑</button>
+          <button class="action-btn delete" bindtap="deleteCustomer" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="fab" bindtap="navigateToAdd">+</view>
+</view>

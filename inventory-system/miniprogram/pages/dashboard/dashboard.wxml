@@ -1,0 +1,65 @@
+<view class="container">
+  <view class="header">
+    <text class="header-title">进销库存系统</text>
+  </view>
+
+  <view class="stats-grid">
+    <view class="stat-card" bindtap="navigateToProducts">
+      <text class="stat-value">{{stats.totalProducts}}</text>
+      <text class="stat-label">商品总数</text>
+    </view>
+    <view class="stat-card" bindtap="navigateToProducts">
+      <text class="stat-value">{{stats.totalStock}}</text>
+      <text class="stat-label">库存总量</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value warning">{{stats.lowStockCount}}</text>
+      <text class="stat-label">库存预警</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{stats.todayIn}}</text>
+      <text class="stat-label">今日入库</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value">{{stats.todayOut}}</text>
+      <text class="stat-label">今日出库</text>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">最近商品</text>
+      <text class="section-more" bindtap="navigateToProducts">查看全部</text>
+    </view>
+
+    <view wx:if="{{loading}}" class="loading">
+      <text>加载中...</text>
+    </view>
+
+    <view wx:else>
+      <view wx:if="{{recentProducts.length === 0}}" class="empty-state">
+        <text class="empty-icon">📦</text>
+        <text>暂无商品</text>
+      </view>
+
+      <view wx:else class="product-list">
+        <view
+          class="list-item"
+          wx:for="{{recentProducts}}"
+          wx:key="id"
+          bindtap="navigateToProduct"
+          data-id="{{item.id}}"
+        >
+          <view class="product-info">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-code">编码: {{item.code}}</text>
+          </view>
+          <view class="product-meta">
+            <text class="product-stock">库存: {{item.stock}}</text>
+            <text class="product-price">¥{{item.price}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

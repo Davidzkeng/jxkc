@@ -1,0 +1,98 @@
+.container {
+  min-height: 100vh;
+  padding-bottom: 160rpx;
+}
+
+.supplier-list {
+  padding: 24rpx;
+}
+
+.supplier-card {
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.supplier-header {
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.supplier-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.supplier-body {
+  padding: 24rpx 32rpx;
+}
+
+.supplier-row {
+  display: flex;
+  margin-bottom: 16rpx;
+}
+
+.supplier-row:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  width: 120rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+
+.value {
+  flex: 1;
+  font-size: 26rpx;
+  color: #333;
+}
+
+.supplier-actions {
+  display: flex;
+  gap: 16rpx;
+  padding: 16rpx 32rpx 32rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 64rpx;
+  line-height: 64rpx;
+  font-size: 26rpx;
+  border-radius: 8rpx;
+  border: none;
+}
+
+.action-btn.edit {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.action-btn.delete {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 120rpx;
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: #1890ff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60rpx;
+  box-shadow: 0 4rpx 12rpx rgba(24, 144, 255, 0.4);
+  z-index: 1000;
+}
+
+.fab:active {
+  opacity: 0.8;
+}

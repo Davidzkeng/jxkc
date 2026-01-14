@@ -1,0 +1,54 @@
+{
+  "pages": [
+    "pages/dashboard/dashboard",
+    "pages/products/products",
+    "pages/products/form",
+    "pages/products/detail",
+    "pages/categories/categories",
+    "pages/categories/form",
+    "pages/customers/customers",
+    "pages/customers/form",
+    "pages/suppliers/suppliers",
+    "pages/suppliers/form",
+    "pages/in-records/in-records",
+    "pages/in-records/form",
+    "pages/out-records/out-records",
+    "pages/out-records/form"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1890ff",
+    "navigationBarTitleText": "进销库存系统",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1890ff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/dashboard/dashboard",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/products/products",
+        "text": "商品"
+      },
+      {
+        "pagePath": "pages/in-records/in-records",
+        "text": "入库"
+      },
+      {
+        "pagePath": "pages/out-records/out-records",
+        "text": "出库"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 10000,
+    "downloadFile": 10000
+  },
+  "debug": false
+}

@@ -1,0 +1,46 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中... loading={{loading}}</text>
+  </view>
+
+  <view wx:else class="form">
+    <view class="form-item">
+      <text class="form-label">商品名称 *</text>
+      <input class="form-input" value="{{name}}" bindinput="onNameChange" placeholder="请输入商品名称" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品编码 *</text>
+      <input class="form-input" value="{{code}}" bindinput="onCodeChange" placeholder="请输入商品编码" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品类别 *</text>
+      <picker mode="selector" range="{{categories}}" range-key="name" value="{{categoryId}}" bindchange="onCategoryChange">
+        <view class="form-picker">
+          {{categoryId >= 0 && categories[categoryId] ? categories[categoryId].name : '请选择商品类别'}}
+          <text class="arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品价格 *</text>
+      <input class="form-input" type="digit" value="{{price}}" bindinput="onPriceChange" placeholder="请输入商品价格" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品库存 *</text>
+      <input class="form-input" type="number" value="{{stock}}" bindinput="onStockChange" placeholder="请输入商品库存" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">商品描述</text>
+      <textarea class="form-textarea" value="{{description}}" bindinput="onDescriptionChange" placeholder="请输入商品描述" maxlength="200" />
+    </view>
+
+    <view class="form-actions">
+      <button class="submit-btn" loading="{{submitLoading}}" bindtap="submit">保存</button>
+    </view>
+  </view>
+</view>

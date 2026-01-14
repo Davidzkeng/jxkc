@@ -1,0 +1,48 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else>
+    <view wx:if="{{inRecords.length === 0}}" class="empty-state">
+      <text class="empty-icon">📥</text>
+      <text>暂无入库记录</text>
+    </view>
+
+    <view wx:else class="record-list">
+      <view
+        class="record-card"
+        wx:for="{{inRecords}}"
+        wx:key="id"
+      >
+        <view class="record-header">
+          <text class="record-title">{{item.product.name}}</text>
+          <text class="record-date">{{item.formattedDate}}</text>
+        </view>
+        <view class="record-body">
+          <view class="record-row">
+            <text class="label">供应商:</text>
+            <text class="value">{{item.supplier.name}}</text>
+          </view>
+          <view class="record-row">
+            <text class="label">数量:</text>
+            <text class="value quantity">+{{item.quantity}}</text>
+          </view>
+          <view class="record-row">
+            <text class="label">单价:</text>
+            <text class="value">¥{{item.price}}</text>
+          </view>
+          <view class="record-row">
+            <text class="label">总额:</text>
+            <text class="value total">¥{{item.totalAmount}}</text>
+          </view>
+        </view>
+        <view class="record-actions">
+          <button class="action-btn delete" bindtap="deleteRecord" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="fab" bindtap="navigateToAdd">+</view>
+</view>

@@ -78,7 +78,7 @@ exports.createOutRecord = async (req, res) => {
       }
     });
     
-    res.status(201).json(outRecord);
+    res.json(outRecord);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

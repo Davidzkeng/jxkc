@@ -34,7 +34,7 @@ exports.createSupplier = async (req, res) => {
     const supplier = await prisma.supplier.create({
       data: { name, contact, phone, address }
     });
-    res.status(201).json(supplier);
+    res.json(supplier);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

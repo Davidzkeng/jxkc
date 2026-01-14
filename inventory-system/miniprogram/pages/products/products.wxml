@@ -1,0 +1,48 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else>
+    <view wx:if="{{products.length === 0}}" class="empty-state">
+      <text class="empty-icon">📦</text>
+      <text>暂无商品</text>
+    </view>
+
+    <view wx:else class="product-list">
+      <view
+        class="product-card"
+        wx:for="{{products}}"
+        wx:key="id"
+      >
+        <view class="product-header" bindtap="viewDetail" data-id="{{item.id}}">
+          <view class="product-info">
+            <text class="product-name">{{item.name}}</text>
+            <text class="product-code">编码: {{item.code}}</text>
+          </view>
+          <text class="arrow">></text>
+        </view>
+        <view class="product-body">
+          <view class="product-row">
+            <text class="label">类别:</text>
+            <text class="value">{{item.category ? item.category.name : '未分类'}}</text>
+          </view>
+          <view class="product-row">
+            <text class="label">价格:</text>
+            <text class="value price">¥{{item.price}}</text>
+          </view>
+          <view class="product-row">
+            <text class="label">库存:</text>
+            <text class="value stock {{item.stock < 10 ? 'warning' : ''}}">{{item.stock}}</text>
+          </view>
+        </view>
+        <view class="product-actions">
+          <button class="action-btn edit" bindtap="navigateToEdit" data-id="{{item.id}}">编辑</button>
+          <button class="action-btn delete" bindtap="deleteProduct" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="fab" bindtap="navigateToAdd">+</view>
+</view>

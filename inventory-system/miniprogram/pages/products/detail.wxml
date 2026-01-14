@@ -1,0 +1,51 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{product}}" class="detail">
+    <view class="card">
+      <view class="detail-header">
+        <text class="product-name">{{product.name}}</text>
+        <text class="product-code">编码: {{product.code}}</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="detail-item">
+        <text class="label">类别</text>
+        <text class="value">{{product.category ? product.category.name : '未分类'}}</text>
+      </view>
+      <view class="detail-item">
+        <text class="label">价格</text>
+        <text class="value price">¥{{product.price}}</text>
+      </view>
+      <view class="detail-item">
+        <text class="label">库存</text>
+        <text class="value stock {{product.stock < 10 ? 'warning' : ''}}">{{product.stock}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{product.description}}" class="card">
+      <view class="detail-item">
+        <text class="label">描述</text>
+      </view>
+      <text class="description">{{product.description}}</text>
+    </view>
+
+    <view class="card info-card">
+      <view class="detail-item">
+        <text class="label">创建时间</text>
+        <text class="value">{{product.createdAt}}</text>
+      </view>
+      <view class="detail-item">
+        <text class="label">更新时间</text>
+        <text class="value">{{product.updatedAt}}</text>
+      </view>
+    </view>
+
+    <view class="actions">
+      <button class="action-btn" bindtap="editProduct">编辑商品</button>
+    </view>
+  </view>
+</view>

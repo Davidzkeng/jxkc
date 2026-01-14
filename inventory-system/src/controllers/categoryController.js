@@ -34,7 +34,7 @@ exports.createCategory = async (req, res) => {
     const category = await prisma.category.create({
       data: { name, description }
     });
-    res.status(201).json(category);
+    res.json(category);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

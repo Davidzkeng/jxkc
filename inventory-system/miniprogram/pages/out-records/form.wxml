@@ -1,0 +1,46 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="form">
+    <view class="form-item">
+      <text class="form-label">选择商品 *</text>
+      <picker mode="selector" range="{{products}}" range-key="name" value="{{productId}}" bindchange="onProductChange">
+        <view class="form-picker">
+          {{productId >= 0 && products[productId] ? products[productId].name : '请选择商品'}}
+          <text class="arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">选择客户 *</text>
+      <picker mode="selector" range="{{customers}}" range-key="name" value="{{customerId}}" bindchange="onCustomerChange">
+        <view class="form-picker">
+          {{customerId >= 0 && customers[customerId] ? customers[customerId].name : '请选择客户'}}
+          <text class="arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">出库数量 *</text>
+      <input class="form-input" type="number" value="{{quantity}}" bindinput="onQuantityChange" placeholder="请输入出库数量" />
+    </view>
+
+    <view class="form-item">
+      <text class="form-label">单价 *</text>
+      <input class="form-input" type="digit" value="{{price}}" bindinput="onPriceChange" placeholder="请输入单价" />
+    </view>
+
+    <view wx:if="{{totalAmount}}" class="form-item total-item">
+      <text class="form-label">出库总额</text>
+      <text class="total-amount">¥{{totalAmount}}</text>
+    </view>
+
+    <view class="form-actions">
+      <button class="submit-btn" loading="{{submitLoading}}" bindtap="submit">确认出库</button>
+    </view>
+  </view>
+</view>

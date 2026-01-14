@@ -34,7 +34,7 @@ exports.createCustomer = async (req, res) => {
     const customer = await prisma.customer.create({
       data: { name, contact, phone, address }
     });
-    res.status(201).json(customer);
+    res.json(customer);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
