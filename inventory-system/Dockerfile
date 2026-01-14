@@ -36,6 +36,9 @@ RUN npm ci --only=production
 # Copy Prisma schema and migrations
 COPY prisma ./prisma/
 
+# Generate Prisma Client
+RUN npx prisma generate
+
 # Copy backend source
 COPY src ./src/
 
@@ -62,5 +65,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Run Prisma migrations and start server
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "node src/server/server.js"]
+  ENTRYPOINT ["dumb-init", "--"]
+  CMD ["sh", "-c", "npx prisma migrate deploy && node src/server/server.js"]
