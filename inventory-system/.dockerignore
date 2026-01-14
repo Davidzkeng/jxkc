@@ -10,7 +10,6 @@ dist
 
 # Environment files
 .env
-.env.*
 
 # Git
 .git

@@ -4,15 +4,10 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
-COPY package-lock.json* ./
-COPY yarn.lock* ./
-COPY pnpm-lock.yaml* ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm ci --only=production=false || \
-    yarn install --frozen-lockfile || \
-    pnpm install --frozen-lockfile
+RUN npm ci
 
 # Copy source code
 COPY . .
@@ -33,15 +28,10 @@ RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
 # Copy package files
-COPY package*.json ./
-COPY package-lock.json* ./
-COPY yarn.lock* ./
-COPY pnpm-lock.yaml* ./
+COPY package.json package-lock.json ./
 
 # Install production dependencies only
-RUN npm ci --only=production || \
-    yarn install --frozen-lockfile --production || \
-    pnpm install --frozen-lockfile --prod
+RUN npm ci --only=production
 
 # Copy Prisma schema and migrations
 COPY prisma ./prisma/
