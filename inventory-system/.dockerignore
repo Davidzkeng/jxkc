@@ -28,9 +28,6 @@ Thumbs.db
 # Testing
 coverage
 
-# Prisma
-prisma/migrations/*/migration.sql
-
 # Logs
 logs
 *.log
