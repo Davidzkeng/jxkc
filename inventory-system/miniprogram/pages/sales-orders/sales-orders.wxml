@@ -1,0 +1,48 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="content">
+    <view wx:if="{{salesOrders.length === 0}}" class="empty-state">
+      <text class="empty-icon">📋</text>
+      <text>暂无销售单</text>
+    </view>
+
+    <view wx:else class="order-list">
+      <view
+        class="order-card"
+        wx:for="{{salesOrders}}"
+        wx:key="id"
+        bindtap="viewDetail"
+        data-id="{{item.id}}"
+      >
+        <view class="order-header">
+          <text class="order-number">销售单号: {{item.orderNumber}}</text>
+          <text class="order-date">{{item.createdAt}}</text>
+        </view>
+        <view class="order-body">
+          <view class="order-info">
+            <text class="info-label">客户:</text>
+            <text class="info-value">{{item.customerName}}</text>
+          </view>
+          <view class="order-info">
+            <text class="info-label">商品数量:</text>
+            <text class="info-value">{{item.productCount}}</text>
+          </view>
+          <view class="order-info">
+            <text class="info-label">总金额:</text>
+            <text class="info-value amount">¥{{item.totalAmount}}</text>
+          </view>
+        </view>
+        <view class="order-footer">
+          <text class="order-status">{{item.status}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="fab" bindtap="createOrder">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

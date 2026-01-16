@@ -31,6 +31,10 @@
       <text class="section-title">功能菜单</text>
     </view>
     <view class="menu-grid">
+      <view class="menu-item" bindtap="navigateToSalesOrders">
+        <text class="menu-icon">📋</text>
+        <text class="menu-text">销售单</text>
+      </view>
       <view class="menu-item" bindtap="scanCode">
         <text class="menu-icon">📷</text>
         <text class="menu-text">扫码入库</text>

@@ -81,6 +81,12 @@ Page({
     });
   },
 
+  navigateToSalesOrders() {
+    wx.navigateTo({
+      url: '/pages/sales-orders/sales-orders'
+    });
+  },
+
   // 扫码入库功能
   scanCode() {
     wx.scanCode({

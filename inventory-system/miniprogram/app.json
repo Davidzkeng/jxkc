@@ -13,7 +13,10 @@
     "pages/in-records/in-records",
     "pages/in-records/form",
     "pages/out-records/out-records",
-    "pages/out-records/form"
+    "pages/out-records/form",
+    "pages/sales-orders/sales-orders",
+    "pages/sales-orders/form",
+    "pages/sales-orders/detail"
   ],
   "window": {
     "backgroundTextStyle": "light",

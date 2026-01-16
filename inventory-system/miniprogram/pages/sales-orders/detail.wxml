@@ -1,0 +1,71 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="content">
+    <view class="order-card">
+      <view class="order-header">
+        <text class="order-title">销售单</text>
+        <text class="order-number">{{order.orderNumber}}</text>
+      </view>
+      
+      <view class="order-info">
+        <view class="info-row">
+          <text class="info-label">客户:</text>
+          <text class="info-value">{{order.customerName}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">日期:</text>
+          <text class="info-value">{{order.createdAt}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">状态:</text>
+          <text class="info-value status">{{order.status}}</text>
+        </view>
+      </view>
+
+      <view class="products-section">
+        <view class="section-title">商品明细</view>
+        <view class="products-list">
+          <view class="product-item" wx:for="{{order.products}}" wx:key="id">
+            <view class="product-info">
+              <text class="product-name">{{item.name}}</text>
+              <text class="product-code">编码: {{item.code}}</text>
+            </view>
+            <view class="product-details">
+              <text class="product-quantity">数量: {{item.quantity}}</text>
+              <text class="product-price">单价: ¥{{item.price}}</text>
+              <text class="product-total">小计: ¥{{item.totalAmount}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <view class="summary-section">
+        <view class="summary-row">
+          <text class="summary-label">商品数量:</text>
+          <text class="summary-value">{{order.productCount}}</text>
+        </view>
+        <view class="summary-row">
+          <text class="summary-label">总金额:</text>
+          <text class="summary-value amount">¥{{order.totalAmount}}</text>
+        </view>
+        <view class="summary-row" wx:if="{{order.remark}}">
+          <text class="summary-label">备注:</text>
+          <text class="summary-value">{{order.remark}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="actions">
+      <button class="action-btn print-btn" bindtap="printOrder">
+        <text class="btn-icon">🖨️</text>
+        <text class="btn-text">打印</text>
+      </button>
+      <button class="action-btn back-btn" bindtap="goBack">
+        <text class="btn-text">返回</text>
+      </button>
+    </view>
+  </view>
+</view>
