@@ -28,6 +28,34 @@
 
   <view class="section">
     <view class="section-header">
+      <text class="section-title">功能菜单</text>
+    </view>
+    <view class="menu-grid">
+      <view class="menu-item" bindtap="scanCode">
+        <text class="menu-icon">📷</text>
+        <text class="menu-text">扫码入库</text>
+      </view>
+      <view class="menu-item" bindtap="scanCodeOut">
+        <text class="menu-icon">📷</text>
+        <text class="menu-text">扫码出库</text>
+      </view>
+      <view class="menu-item" bindtap="navigateToCustomers">
+        <text class="menu-icon">👥</text>
+        <text class="menu-text">客户管理</text>
+      </view>
+      <view class="menu-item" bindtap="navigateToSuppliers">
+        <text class="menu-icon">🤝</text>
+        <text class="menu-text">供应商管理</text>
+      </view>
+      <view class="menu-item" bindtap="navigateToCategories">
+        <text class="menu-icon">📁</text>
+        <text class="menu-text">分类管理</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-header">
       <text class="section-title">最近商品</text>
       <text class="section-more" bindtap="navigateToProducts">查看全部</text>
     </view>

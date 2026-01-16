@@ -1,32 +1,69 @@
-const api = require('../../utils/api');
-const util = require('../../utils/util');
+const api = require('../../utils/api.js');
+const util = require('../../utils/util.js');
 
 Page({
   data: {
-    productId: -1,
-    customerId: -1,
+    // 原始数据
+    products: [],
+    customers: [],
+    
+    // 选中的数据
+    selectedProduct: null,
+    selectedCustomer: null,
+    
+    // 搜索相关
+    productSearchKey: '',
+    customerSearchKey: '',
+    filteredProducts: [],
+    filteredCustomers: [],
+    showProductList: false,
+    showCustomerList: false,
+    
+    // 表单数据
     quantity: '',
     price: '',
     totalAmount: '',
-    products: [],
-    customers: [],
     loading: false,
     submitLoading: false
   },
 
-  onLoad() {
-    this.loadData();
+  onLoad(options) {
+    this.loadData(options);
   },
 
-  loadData() {
+  loadData(options) {
     this.setData({ loading: true });
     Promise.all([api.getProducts(), api.getCustomers()])
       .then(([productsRes, customersRes]) => {
+        const products = Array.isArray(productsRes) ? productsRes : [];
+        const customers = Array.isArray(customersRes) ? customersRes : [];
+        
+        let selectedProduct = null;
+        
+        // 如果有扫码传递的商品ID，自动选择该商品
+        if (options && options.productId) {
+          const productId = parseInt(options.productId);
+          selectedProduct = products.find(p => p.id === productId);
+        }
+        
         this.setData({
-          products: Array.isArray(productsRes) ? productsRes : [],
-          customers: Array.isArray(customersRes) ? customersRes : [],
+          products: products,
+          customers: customers,
+          filteredProducts: products,
+          filteredCustomers: customers,
+          selectedProduct: selectedProduct,
           loading: false
         });
+        
+        if (selectedProduct) {
+          // 自动填充商品信息后，聚焦到出库数量输入框
+          wx.nextTick(() => {
+            const quantityInput = wx.createSelectorQuery().select('.form-input[type="number"]');
+            quantityInput.fields({ size: true }, function(res) {
+              console.log('数量输入框信息:', res);
+            }).exec();
+          });
+        }
       })
       .catch(err => {
         console.error('加载数据失败', err);
@@ -35,12 +72,89 @@ Page({
       });
   },
 
-  onProductChange(e) {
-    this.setData({ productId: e.detail.value });
+  // 商品搜索
+  onProductSearchInput(e) {
+    const searchKey = e.detail.value;
+    this.setData({
+      productSearchKey: searchKey,
+      showProductList: true,
+      filteredProducts: this.filterProducts(searchKey)
+    });
   },
 
-  onCustomerChange(e) {
-    this.setData({ customerId: e.detail.value });
+  filterProducts(searchKey) {
+    if (!searchKey) {
+      return this.data.products;
+    }
+    return this.data.products.filter(product => 
+      product.name.toLowerCase().includes(searchKey.toLowerCase()) ||
+      product.code.toLowerCase().includes(searchKey.toLowerCase())
+    );
+  },
+
+  toggleProductList() {
+    this.setData({
+      showProductList: !this.data.showProductList,
+      showCustomerList: false
+    });
+  },
+
+  selectProduct(e) {
+    const product = e.currentTarget.dataset.product;
+    this.setData({
+      selectedProduct: product,
+      showProductList: false,
+      productSearchKey: ''
+    });
+  },
+
+  clearSelectedProduct() {
+    this.setData({
+      selectedProduct: null
+    });
+  },
+
+  // 客户搜索
+  onCustomerSearchInput(e) {
+    const searchKey = e.detail.value;
+    this.setData({
+      customerSearchKey: searchKey,
+      showCustomerList: true,
+      filteredCustomers: this.filterCustomers(searchKey)
+    });
+  },
+
+  filterCustomers(searchKey) {
+    if (!searchKey) {
+      return this.data.customers;
+    }
+    return this.data.customers.filter(customer => 
+      customer.name.toLowerCase().includes(searchKey.toLowerCase()) ||
+      customer.contact.toLowerCase().includes(searchKey.toLowerCase()) ||
+      customer.phone.includes(searchKey)
+    );
+  },
+
+  toggleCustomerList() {
+    this.setData({
+      showCustomerList: !this.data.showCustomerList,
+      showProductList: false
+    });
+  },
+
+  selectCustomer(e) {
+    const customer = e.currentTarget.dataset.customer;
+    this.setData({
+      selectedCustomer: customer,
+      showCustomerList: false,
+      customerSearchKey: ''
+    });
+  },
+
+  clearSelectedCustomer() {
+    this.setData({
+      selectedCustomer: null
+    });
   },
 
   onQuantityChange(e) {
@@ -64,12 +178,12 @@ Page({
   submit() {
     console.log('提交数据', this.data);
 
-    if (this.data.productId === -1) {
+    if (!this.data.selectedProduct) {
       util.showError('请选择商品');
       return;
     }
 
-    if (this.data.customerId === -1) {
+    if (!this.data.selectedCustomer) {
       util.showError('请选择客户');
       return;
     }
@@ -89,8 +203,8 @@ Page({
     const totalAmount = quantity * price;
 
     const data = {
-      productId: parseInt(this.data.productId),
-      customerId: parseInt(this.data.customerId),
+      productId: this.data.selectedProduct.id,
+      customerId: this.data.selectedCustomer.id,
       quantity: quantity,
       price: price,
       totalAmount: totalAmount

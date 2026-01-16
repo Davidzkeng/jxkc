@@ -23,6 +23,20 @@
   border-bottom: 1rpx solid #f0f0f0;
 }
 
+/* 二维码样式 */
+.qrcode-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.qrcode {
+  width: 160rpx;
+  height: 160rpx;
+}
+
 .product-info {
   display: flex;
   flex-direction: column;

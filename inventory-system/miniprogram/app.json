@@ -37,6 +37,10 @@
         "text": "商品"
       },
       {
+        "pagePath": "pages/customers/customers",
+        "text": "客户"
+      },
+      {
         "pagePath": "pages/in-records/in-records",
         "text": "入库"
       },

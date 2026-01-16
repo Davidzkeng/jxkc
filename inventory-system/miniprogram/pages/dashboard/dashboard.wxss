@@ -121,3 +121,34 @@
   color: #1890ff;
   font-weight: 600;
 }
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24rpx;
+}
+
+.menu-item {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 32rpx 24rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+}
+
+.menu-item:active {
+  transform: scale(0.98);
+}
+
+.menu-icon {
+  font-size: 64rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.menu-text {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+}

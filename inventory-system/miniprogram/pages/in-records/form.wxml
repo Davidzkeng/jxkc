@@ -4,24 +4,100 @@
   </view>
 
   <view wx:else class="form">
+    <!-- 商品搜索选择 -->
     <view class="form-item">
       <text class="form-label">选择商品 *</text>
-      <picker mode="selector" range="{{products}}" range-key="name" value="{{productId}}" bindchange="onProductChange">
-        <view class="form-picker">
-          {{productId >= 0 && products[productId] ? products[productId].name : '请选择商品'}}
-          <text class="arrow">></text>
+      <view class="search-picker-container">
+        <view class="search-input-wrapper">
+          <input 
+            class="search-input" 
+            placeholder="搜索商品..." 
+            value="{{productSearchKey}}" 
+            bindinput="onProductSearchInput" 
+          />
         </view>
-      </picker>
+        <view 
+          class="selected-item" 
+          wx:if="{{selectedProduct}}"
+        >
+          <text class="selected-text">{{selectedProduct.name}}</text>
+          <text class="clear-btn" bindtap="clearSelectedProduct">×</text>
+        </view>
+        <view 
+          class="selected-item placeholder" 
+          wx:else
+          bindtap="toggleProductList"
+        >
+          <text>请选择商品</text>
+        </view>
+        
+        <!-- 商品列表 -->
+        <view class="search-results" wx:if="{{showProductList}}">
+          <scroll-view scroll-y="true" style="max-height: 400rpx;">
+            <view 
+              class="result-item" 
+              wx:for="{{filteredProducts}}" 
+              wx:key="id"
+              bindtap="selectProduct"
+              data-product="{{item}}"
+            >
+              <text class="result-name">{{item.name}}</text>
+              <text class="result-code">{{item.code}}</text>
+            </view>
+            <view class="result-item empty" wx:if="{{filteredProducts.length === 0}}">
+              <text>暂无商品</text>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
     </view>
 
+    <!-- 供应商搜索选择 -->
     <view class="form-item">
       <text class="form-label">选择供应商 *</text>
-      <picker mode="selector" range="{{suppliers}}" range-key="name" value="{{supplierId}}" bindchange="onSupplierChange">
-        <view class="form-picker">
-          {{supplierId >= 0 && suppliers[supplierId] ? suppliers[supplierId].name : '请选择供应商'}}
-          <text class="arrow">></text>
+      <view class="search-picker-container">
+        <view class="search-input-wrapper">
+          <input 
+            class="search-input" 
+            placeholder="搜索供应商..." 
+            value="{{supplierSearchKey}}" 
+            bindinput="onSupplierSearchInput" 
+          />
         </view>
-      </picker>
+        <view 
+          class="selected-item" 
+          wx:if="{{selectedSupplier}}"
+        >
+          <text class="selected-text">{{selectedSupplier.name}}</text>
+          <text class="clear-btn" bindtap="clearSelectedSupplier">×</text>
+        </view>
+        <view 
+          class="selected-item placeholder" 
+          wx:else
+          bindtap="toggleSupplierList"
+        >
+          <text>请选择供应商</text>
+        </view>
+        
+        <!-- 供应商列表 -->
+        <view class="search-results" wx:if="{{showSupplierList}}">
+          <scroll-view scroll-y="true" style="max-height: 400rpx;">
+            <view 
+              class="result-item" 
+              wx:for="{{filteredSuppliers}}" 
+              wx:key="id"
+              bindtap="selectSupplier"
+              data-supplier="{{item}}"
+            >
+              <text class="result-name">{{item.name}}</text>
+              <text class="result-contact">{{item.contact}} - {{item.phone}}</text>
+            </view>
+            <view class="result-item empty" wx:if="{{filteredSuppliers.length === 0}}">
+              <text>暂无供应商</text>
+            </view>
+          </scroll-view>
+        </view>
+      </view>
     </view>
 
     <view class="form-item">

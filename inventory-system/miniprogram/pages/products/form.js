@@ -1,5 +1,5 @@
-const api = require('../../utils/api');
-const util = require('../../utils/util');
+const api = require('../../utils/api.js');
+const util = require('../../utils/util.js');
 
 Page({
   data: {
@@ -16,6 +16,21 @@ Page({
     submitLoading: false
   },
 
+  // 生成商品编码
+  generateProductCode() {
+    // 规则：PROD + 年月日时分秒 + 3位随机数
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
+    const random = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    
+    return `PROD${year}${month}${day}${hour}${minute}${second}${random}`;
+  },
+
   onLoad(options) {
     console.log('===== form.js onLoad 开始 =====');
     console.log('options:', options);
@@ -28,6 +43,9 @@ Page({
       this.loadProductDetail(options.id);
     } else {
       console.log('新增模式，直接显示表单');
+      // 新增商品时自动生成编码
+      const generatedCode = this.generateProductCode();
+      this.setData({ code: generatedCode });
     }
     console.log('加载类别列表');
     this.loadCategories();
