@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Modal, Form, Input, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { API_BASE_URL } from '../config/api';
 
 const CustomerManagement = () => {
   const [customers, setCustomers] = useState([]);
@@ -12,7 +13,7 @@ const CustomerManagement = () => {
   // 获取所有客户
   const fetchCustomers = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/customers');
+      const response = await fetch(`${API_BASE_URL}/api/customers`);
       const data = await response.json();
       setCustomers(data);
     } catch (error) {
@@ -56,7 +57,7 @@ const CustomerManagement = () => {
     try {
       if (editingCustomer) {
         // 更新客户
-        await fetch(`http://localhost:3001/api/customers/${editingCustomer.id}`, {
+        await fetch(`${API_BASE_URL}/api/customers/${editingCustomer.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +67,7 @@ const CustomerManagement = () => {
         message.success('客户更新成功');
       } else {
         // 创建客户
-        await fetch('http://localhost:3001/api/customers', {
+        await fetch(`${API_BASE_URL}/api/customers`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,7 +88,7 @@ const CustomerManagement = () => {
   // 删除客户
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:3001/api/customers/${id}`, {
+      await fetch(`${API_BASE_URL}/api/customers/${id}`, {
         method: 'DELETE',
       });
       message.success('客户删除成功');

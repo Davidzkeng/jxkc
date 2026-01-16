@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Modal, Form, Input, Select, InputNumber, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { API_BASE_URL } from '../config/api';
 
 const { Option } = Select;
 
@@ -15,7 +16,7 @@ const ProductManagement = () => {
   // 获取所有商品
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/products');
+      const response = await fetch(`${API_BASE_URL}/api/products`);
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -29,7 +30,7 @@ const ProductManagement = () => {
   // 获取所有类别
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/categories');
+      const response = await fetch(`${API_BASE_URL}/api/categories`);
       const data = await response.json();
       setCategories(data);
     } catch (error) {
@@ -76,7 +77,7 @@ const ProductManagement = () => {
     try {
       if (editingProduct) {
         // 更新商品
-        await fetch(`http://localhost:3001/api/products/${editingProduct.id}`, {
+        await fetch(`${API_BASE_URL}/api/products/${editingProduct.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ const ProductManagement = () => {
         message.success('商品更新成功');
       } else {
         // 创建商品
-        await fetch('http://localhost:3001/api/products', {
+        await fetch(`${API_BASE_URL}/api/products`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -107,7 +108,7 @@ const ProductManagement = () => {
   // 删除商品
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:3001/api/products/${id}`, {
+      await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: 'DELETE',
       });
       message.success('商品删除成功');

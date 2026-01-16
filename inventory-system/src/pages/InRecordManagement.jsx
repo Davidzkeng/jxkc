@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Modal, Form, Select, InputNumber, DatePicker, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { API_BASE_URL } from '../config/api';
 
 const { Option } = Select;
 
@@ -17,7 +18,7 @@ const InRecordManagement = () => {
   // 获取所有入库记录
   const fetchInRecords = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/in-records');
+      const response = await fetch(`${API_BASE_URL}/api/in-records`);
       const data = await response.json();
       setInRecords(data);
     } catch (error) {
@@ -31,7 +32,7 @@ const InRecordManagement = () => {
   // 获取所有商品
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/products');
+      const response = await fetch(`${API_BASE_URL}/api/products`);
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -43,7 +44,7 @@ const InRecordManagement = () => {
   // 获取所有供应商
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/suppliers');
+      const response = await fetch(`${API_BASE_URL}/api/suppliers`);
       const data = await response.json();
       setSuppliers(data);
     } catch (error) {
@@ -96,7 +97,7 @@ const InRecordManagement = () => {
 
       if (editingRecord) {
         // 更新入库记录
-        await fetch(`http://localhost:3001/api/in-records/${editingRecord.id}`, {
+        await fetch(`${API_BASE_URL}/api/in-records/${editingRecord.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -106,7 +107,7 @@ const InRecordManagement = () => {
         message.success('入库记录更新成功');
       } else {
         // 创建入库记录
-        await fetch('http://localhost:3001/api/in-records', {
+        await fetch(`${API_BASE_URL}/api/in-records`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -127,7 +128,7 @@ const InRecordManagement = () => {
   // 删除入库记录
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:3001/api/in-records/${id}`, {
+      await fetch(`${API_BASE_URL}/api/in-records/${id}`, {
         method: 'DELETE',
       });
       message.success('入库记录删除成功');

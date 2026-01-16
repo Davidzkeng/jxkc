@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Modal, Form, Select, InputNumber, DatePicker, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { API_BASE_URL } from '../config/api';
 
 const { Option } = Select;
 
@@ -17,7 +18,7 @@ const OutRecordManagement = () => {
   // 获取所有出库记录
   const fetchOutRecords = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/out-records');
+      const response = await fetch(`${API_BASE_URL}/api/out-records`);
       const data = await response.json();
       setOutRecords(data);
     } catch (error) {
@@ -31,7 +32,7 @@ const OutRecordManagement = () => {
   // 获取所有商品
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/products');
+      const response = await fetch(`${API_BASE_URL}/api/products`);
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -43,7 +44,7 @@ const OutRecordManagement = () => {
   // 获取所有客户
   const fetchCustomers = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/customers');
+      const response = await fetch(`${API_BASE_URL}/api/customers`);
       const data = await response.json();
       setCustomers(data);
     } catch (error) {
@@ -96,7 +97,7 @@ const OutRecordManagement = () => {
 
       if (editingRecord) {
         // 更新出库记录
-        await fetch(`http://localhost:3001/api/out-records/${editingRecord.id}`, {
+        await fetch(`${API_BASE_URL}/api/out-records/${editingRecord.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -106,7 +107,7 @@ const OutRecordManagement = () => {
         message.success('出库记录更新成功');
       } else {
         // 创建出库记录
-        await fetch('http://localhost:3001/api/out-records', {
+        await fetch(`${API_BASE_URL}/api/out-records`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -127,7 +128,7 @@ const OutRecordManagement = () => {
   // 删除出库记录
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:3001/api/out-records/${id}`, {
+      await fetch(`${API_BASE_URL}/api/out-records/${id}`, {
         method: 'DELETE',
       });
       message.success('出库记录删除成功');

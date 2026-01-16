@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Modal, Form, Input, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { API_BASE_URL } from '../config/api';
 
 const SupplierManagement = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -12,7 +13,7 @@ const SupplierManagement = () => {
   // 获取所有供应商
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/suppliers');
+      const response = await fetch(`${API_BASE_URL}/api/suppliers`);
       const data = await response.json();
       setSuppliers(data);
     } catch (error) {
@@ -56,7 +57,7 @@ const SupplierManagement = () => {
     try {
       if (editingSupplier) {
         // 更新供应商
-        await fetch(`http://localhost:3001/api/suppliers/${editingSupplier.id}`, {
+        await fetch(`${API_BASE_URL}/api/suppliers/${editingSupplier.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +67,7 @@ const SupplierManagement = () => {
         message.success('供应商更新成功');
       } else {
         // 创建供应商
-        await fetch('http://localhost:3001/api/suppliers', {
+        await fetch(`${API_BASE_URL}/api/suppliers`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,7 +88,7 @@ const SupplierManagement = () => {
   // 删除供应商
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:3001/api/suppliers/${id}`, {
+      await fetch(`${API_BASE_URL}/api/suppliers/${id}`, {
         method: 'DELETE',
       });
       message.success('供应商删除成功');

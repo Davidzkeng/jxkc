@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Table, Button, Modal, Form, Input, message } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { API_BASE_URL } from '../config/api';
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -12,7 +13,7 @@ const CategoryManagement = () => {
   // 获取所有类别
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/categories');
+      const response = await fetch(`${API_BASE_URL}/api/categories`);
       const data = await response.json();
       setCategories(data);
     } catch (error) {
@@ -56,7 +57,7 @@ const CategoryManagement = () => {
     try {
       if (editingCategory) {
         // 更新类别
-        await fetch(`http://localhost:3001/api/categories/${editingCategory.id}`, {
+        await fetch(`${API_BASE_URL}/api/categories/${editingCategory.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +67,7 @@ const CategoryManagement = () => {
         message.success('类别更新成功');
       } else {
         // 创建类别
-        await fetch('http://localhost:3001/api/categories', {
+        await fetch(`${API_BASE_URL}/api/categories`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,7 +88,7 @@ const CategoryManagement = () => {
   // 删除类别
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:3001/api/categories/${id}`, {
+      await fetch(`${API_BASE_URL}/api/categories/${id}`, {
         method: 'DELETE',
       });
       message.success('类别删除成功');

@@ -6,6 +6,7 @@ import {
   ShoppingCartOutlined,
   BarChartOutlined,
 } from '@ant-design/icons';
+import { API_BASE_URL } from '../config/api';
 
 const { Title } = Typography;
 
@@ -23,7 +24,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/products/stats/stock');
+        const response = await fetch(`${API_BASE_URL}/api/products/stats/stock`);
         const data = await response.json();
         setStats(data);
       } catch (error) {
@@ -40,8 +41,8 @@ const Dashboard = () => {
       try {
         // 这里可以合并获取入库和出库记录，然后排序
         const [inResponse, outResponse] = await Promise.all([
-          fetch('http://localhost:3001/api/in-records'),
-          fetch('http://localhost:3001/api/out-records'),
+          fetch(`${API_BASE_URL}/api/in-records`),
+          fetch(`${API_BASE_URL}/api/out-records`),
         ]);
         
         const [inRecords, outRecords] = await Promise.all([
