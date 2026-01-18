@@ -12,6 +12,7 @@ const customerRoutes = require('../routes/customerRoutes');
 const supplierRoutes = require('../routes/supplierRoutes');
 const inRecordRoutes = require('../routes/inRecordRoutes');
 const outRecordRoutes = require('../routes/outRecordRoutes');
+const salesOrderRoutes = require('../routes/salesOrderRoutes');
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/in-records', inRecordRoutes);
 app.use('/api/out-records', outRecordRoutes);
+app.use('/api/sales-orders', salesOrderRoutes);
 
 // 健康检查端点
 app.get('/api/health', (req, res) => {

@@ -16,7 +16,8 @@
     "pages/out-records/form",
     "pages/sales-orders/sales-orders",
     "pages/sales-orders/form",
-    "pages/sales-orders/detail"
+    "pages/sales-orders/detail",
+    "pages/sales-orders/print"
   ],
   "window": {
     "backgroundTextStyle": "light",

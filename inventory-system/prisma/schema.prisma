@@ -40,6 +40,7 @@ model Product {
   inRecords        InRecord[]
   outRecords       OutRecord[]
   inventoryChecks  InventoryCheck[]
+  salesOrderProducts SalesOrderProduct[]
 }
 
 // 客户模型
@@ -52,6 +53,7 @@ model Customer {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   outRecords  OutRecord[]
+  salesOrders SalesOrder[]
 }
 
 // 供应商模型
@@ -107,6 +109,36 @@ model InventoryCheck {
   date        DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// 销售单模型
+model SalesOrder {
+  id          Int      @id @default(autoincrement())
+  orderNumber String   @unique
+  customerId  Int
+  customer    Customer @relation(fields: [customerId], references: [id])
+  totalAmount Decimal  @default(0.00)
+  status      String   @default("已完成")
+  remark      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  products    SalesOrderProduct[]
+}
+
+// 销售单商品关联模型
+model SalesOrderProduct {
+  id            Int        @id @default(autoincrement())
+  salesOrderId   Int
+  salesOrder    SalesOrder  @relation(fields: [salesOrderId], references: [id])
+  productId     Int
+  product       Product    @relation(fields: [productId], references: [id])
+  quantity      Int
+  price         Decimal
+  totalAmount   Decimal    @default(0.00)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([salesOrderId, productId])
 }
 
 // 系统设置模型

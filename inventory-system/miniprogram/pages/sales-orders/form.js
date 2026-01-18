@@ -150,13 +150,54 @@ Page({
 
   onQuantityChange(e) {
     const index = e.currentTarget.dataset.index;
-    const quantity = e.detail.value;
+    const quantity = parseInt(e.detail.value) || 0;
     const selectedProducts = this.data.selectedProducts;
     
-    selectedProducts[index].quantity = parseInt(quantity) || 0;
+    // 创建新数组，避免直接修改原数组
+    const updatedProducts = [...selectedProducts];
+    updatedProducts[index] = {
+      ...updatedProducts[index],
+      quantity: quantity
+    };
     
     this.setData({
-      selectedProducts: selectedProducts
+      selectedProducts: updatedProducts
+    });
+    
+    this.calculateTotalAmount();
+  },
+
+  increaseQuantity(e) {
+    const index = e.currentTarget.dataset.index;
+    const selectedProducts = this.data.selectedProducts;
+    
+    // 创建新数组，避免直接修改原数组
+    const updatedProducts = [...selectedProducts];
+    updatedProducts[index] = {
+      ...updatedProducts[index],
+      quantity: (updatedProducts[index].quantity || 0) + 1
+    };
+    
+    this.setData({
+      selectedProducts: updatedProducts
+    });
+    
+    this.calculateTotalAmount();
+  },
+
+  decreaseQuantity(e) {
+    const index = e.currentTarget.dataset.index;
+    const selectedProducts = this.data.selectedProducts;
+    
+    // 创建新数组，避免直接修改原数组
+    const updatedProducts = [...selectedProducts];
+    updatedProducts[index] = {
+      ...updatedProducts[index],
+      quantity: Math.max((updatedProducts[index].quantity || 0) - 1, 1) // 确保数量不小于1
+    };
+    
+    this.setData({
+      selectedProducts: updatedProducts
     });
     
     this.calculateTotalAmount();
@@ -188,6 +229,25 @@ Page({
     });
   },
 
+  onPriceChange(e) {
+    const index = e.currentTarget.dataset.index;
+    const price = parseFloat(e.detail.value) || 0;
+    const selectedProducts = this.data.selectedProducts;
+    
+    // 创建新数组，避免直接修改原数组
+    const updatedProducts = [...selectedProducts];
+    updatedProducts[index] = {
+      ...updatedProducts[index],
+      price: price
+    };
+    
+    this.setData({
+      selectedProducts: updatedProducts
+    });
+    
+    this.calculateTotalAmount();
+  },
+
   onRemarkChange(e) {
     this.setData({
       remark: e.detail.value
@@ -207,6 +267,11 @@ Page({
       return;
     }
 
+    // 直接计算总金额，避免精度问题
+    const calculatedTotalAmount = this.data.selectedProducts.reduce((sum, product) => {
+      return sum + (product.price || 0) * (product.quantity || 0);
+    }, 0);
+
     const data = {
       customerId: this.data.selectedCustomer.id,
       products: this.data.selectedProducts.map(p => ({
@@ -215,7 +280,7 @@ Page({
         price: p.price,
         totalAmount: p.price * p.quantity
       })),
-      totalAmount: parseFloat(this.data.totalAmount),
+      totalAmount: calculatedTotalAmount,
       remark: this.data.remark
     };
 
