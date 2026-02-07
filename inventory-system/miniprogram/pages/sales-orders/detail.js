@@ -36,9 +36,9 @@ Page({
       return;
     }
 
-    // 跳转到打印预览页面
+    // 跳转到打印预览页面，只传递订单ID
     wx.navigateTo({
-      url: `/pages/sales-orders/print?order=${encodeURIComponent(JSON.stringify(order))}`
+      url: `/pages/sales-orders/print?id=${order.id}`
     });
   },
 

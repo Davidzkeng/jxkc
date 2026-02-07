@@ -153,7 +153,7 @@ Page({
     }
 
     if (!this.data.stock) {
-      util.showError('请输入商品库存');
+      util.showError('请输入商品库存(斤)');
       return;
     }
 
@@ -162,7 +162,7 @@ Page({
       code: this.data.code,
       categoryId: this.data.categoryIdValue,
       price: parseFloat(this.data.price),
-      stock: parseInt(this.data.stock),
+      stock: parseFloat(this.data.stock),
       description: this.data.description
     };
 

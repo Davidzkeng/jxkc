@@ -1,78 +1,99 @@
 <view class="print-container">
-  <!-- 打印抬头 -->
-  <view class="print-header">
-    <text class="company-name">利发副食</text>
-    <text class="company-info">销售单</text>
-    <text class="company-contact">联系方式: 15820159623</text>
-  </view>
+  <!-- 销售单标题 -->
+  <view class="print-title">销售单</view>
 
-  <!-- 销售单基本信息 -->
-  <view class="order-info">
-    <view class="info-row">
-      <text class="info-label">销售单号:</text>
-      <text class="info-value">{{order.orderNumber}}</text>
+  <!-- 表头信息 -->
+  <view class="header-info">
+    <view class="header-row">
+      <view class="header-item">
+        <text class="label">客户名称:</text>
+        <text class="value">{{order.customerName || ''}}</text>
+      </view>
+      <view class="header-item right">
+        <text class="label">单号:</text>
+        <text class="value">{{order.orderNumber || ''}}</text>
+      </view>
     </view>
-    <view class="info-row">
-      <text class="info-label">日期:</text>
-      <text class="info-value">{{order.createdAt}}</text>
-    </view>
-    <view class="info-row">
-      <text class="info-label">客户:</text>
-      <text class="info-value">{{order.customerName}}</text>
-    </view>
-    <view class="info-row">
-      <text class="info-label">状态:</text>
-      <text class="info-value status">{{order.status}}</text>
+    <view class="header-row">
+      <view class="header-item">
+        <text class="label">电话:</text>
+        <text class="value">{{order.customerContact || ''}} {{order.customerPhone || ''}}</text>
+      </view>
+      <view class="header-item right">
+        <text class="label">日期:</text>
+        <text class="value">{{order.createdAt || ''}}</text>
+      </view>
     </view>
   </view>
 
   <!-- 商品明细表格 -->
   <view class="products-table">
+    <!-- 表头 -->
     <view class="table-header">
-      <view class="table-cell index">序号</view>
-      <view class="table-cell name">商品名称</view>
-      <view class="table-cell code">编码</view>
-      <view class="table-cell quantity">数量</view>
-      <view class="table-cell price">单价</view>
-      <view class="table-cell total">小计</view>
+      <view class="th th-index">编号</view>
+      <view class="th th-name">品名</view>
+      <view class="th th-qty">数量</view>
+      <view class="th th-unit">单位</view>
+      <view class="th th-price">单价</view>
+      <view class="th th-amount">金额</view>
+      <view class="th th-remark">备注</view>
     </view>
+    <!-- 表格内容 -->
     <view class="table-body">
       <view class="table-row" wx:for="{{order.products}}" wx:key="id">
-        <view class="table-cell index">{{index + 1}}</view>
-        <view class="table-cell name">{{item.name}}</view>
-        <view class="table-cell code">{{item.code}}</view>
-        <view class="table-cell quantity">{{item.quantity}}</view>
-        <view class="table-cell price">¥{{item.price}}</view>
-        <view class="table-cell total">¥{{item.totalAmount}}</view>
+        <view class="td td-index">{{item.code || ''}}</view>
+        <view class="td td-name">{{item.name || ''}}</view>
+        <view class="td td-qty">{{item.quantity || ''}}</view>
+        <view class="td td-unit">斤</view>
+        <view class="td td-price">{{item.price ? '¥' + item.price : ''}}</view>
+        <view class="td td-amount">{{item.totalAmount ? '¥' + item.totalAmount : ''}}</view>
+        <view class="td td-remark">{{item.remark || ''}}</view>
+      </view>
+      <!-- 空白行填充 -->
+      <view class="table-row empty-row" wx:for="{{emptyRows}}" wx:key="index">
+        <view class="td td-index"></view>
+        <view class="td td-name"></view>
+        <view class="td td-qty"></view>
+        <view class="td td-unit"></view>
+        <view class="td td-price"></view>
+        <view class="td td-amount"></view>
+        <view class="td td-remark"></view>
       </view>
     </view>
   </view>
 
-  <!-- 总计信息 -->
-  <view class="summary">
+  <!-- 汇总信息 -->
+  <view class="summary-section">
     <view class="summary-row">
-      <text class="summary-label">商品数量:</text>
-      <text class="summary-value">{{order.productCount}}</text>
+      <view class="summary-item">
+        <text class="label">本页货款:</text>
+        <text class="value amount">¥{{order.totalAmount || '0.00'}}</text>
+      </view>
+      <view class="summary-item">
+        <text class="label">本单货款(大写):</text>
+        <text class="value">{{order.totalAmountInChinese || ''}}</text>
+      </view>
     </view>
-    <view class="summary-row total-row">
-      <text class="summary-label">总金额:</text>
-      <text class="summary-value total-amount">¥{{order.totalAmount}}</text>
+    <view class="summary-row">
+      <view class="summary-item">
+        <text class="label">前欠款:</text>
+        <text class="value">{{order.previousDebt ? '¥' + order.previousDebt : '0.00'}}</text>
+      </view>
+      <view class="summary-item">
+        <text class="label">经手人:</text>
+        <text class="value">{{order.operator || ''}}</text>
+      </view>
     </view>
   </view>
 
-  <!-- 备注 -->
-  <view class="remark" wx:if="{{order.remark}}">
-    <text class="remark-label">备注:</text>
-    <text class="remark-content">{{order.remark}}</text>
+  <!-- 底部说明 -->
+  <view class="footer-note">
+    <text class="note-text">注: 货物当面点清，过后概不负责。</text>
   </view>
 
   <!-- 打印按钮 -->
   <view class="actions">
-    <button class="action-btn print-btn" bindtap="print">
-      <text class="btn-text">打印</text>
-    </button>
-    <button class="action-btn back-btn" bindtap="goBack">
-      <text class="btn-text">返回</text>
-    </button>
+    <button class="action-btn print-btn" bindtap="print">打印</button>
+    <button class="action-btn back-btn" bindtap="goBack">返回</button>
   </view>
 </view>

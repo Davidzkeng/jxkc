@@ -22,6 +22,8 @@ exports.getAllSalesOrders = async (req, res) => {
       id: order.id,
       orderNumber: order.orderNumber,
       customerName: order.customer.name,
+      customerContact: order.customer.contact,
+      customerPhone: order.customer.phone,
       createdAt: order.createdAt.toISOString().split('T')[0],
       status: order.status,
       productCount: order.products.length,
@@ -60,6 +62,8 @@ exports.getSalesOrderById = async (req, res) => {
       id: salesOrder.id,
       orderNumber: salesOrder.orderNumber,
       customerName: salesOrder.customer.name,
+      customerContact: salesOrder.customer.contact,
+      customerPhone: salesOrder.customer.phone,
       createdAt: salesOrder.createdAt.toISOString().split('T')[0],
       status: salesOrder.status,
       productCount: salesOrder.products.length,
@@ -92,7 +96,7 @@ exports.createSalesOrder = async (req, res) => {
     // 计算实际总金额并处理缺少price字段的情况
     const processedProducts = products.map(item => {
       const productId = parseInt(item.productId);
-      const quantity = parseInt(item.quantity) || 0;
+      const quantity = parseFloat(item.quantity) || 0;
       // 如果price存在则使用price，否则从totalAmount和quantity反推，或者使用0
       let price = parseFloat(item.price);
       if (isNaN(price) || !price) {
@@ -145,7 +149,7 @@ exports.createSalesOrder = async (req, res) => {
         where: { id: parseInt(item.productId) },
         data: {
           stock: {
-            decrement: parseInt(item.quantity)
+            decrement: parseFloat(item.quantity)
           }
         }
       });
@@ -156,6 +160,8 @@ exports.createSalesOrder = async (req, res) => {
       id: salesOrder.id,
       orderNumber: salesOrder.orderNumber,
       customerName: salesOrder.customer.name,
+      customerContact: salesOrder.customer.contact,
+      customerPhone: salesOrder.customer.phone,
       createdAt: salesOrder.createdAt.toISOString().split('T')[0],
       status: salesOrder.status,
       remark: salesOrder.remark,
@@ -196,7 +202,7 @@ exports.updateSalesOrder = async (req, res) => {
     // 计算实际总金额
     const calculatedTotalAmount = products ? products.reduce((sum, item) => {
       const price = parseFloat(item.price) || 0;
-      const quantity = parseInt(item.quantity) || 0;
+      const quantity = parseFloat(item.quantity) || 0;
       return sum + (price * quantity);
     }, 0) : 0;
 
@@ -244,7 +250,7 @@ exports.updateSalesOrder = async (req, res) => {
           data: {
             salesOrderId: parseInt(id),
             productId: parseInt(item.productId),
-            quantity: parseInt(item.quantity),
+            quantity: parseFloat(item.quantity),
             price: parseFloat(item.price),
             totalAmount: parseFloat(item.totalAmount)
           }
@@ -254,7 +260,7 @@ exports.updateSalesOrder = async (req, res) => {
           where: { id: parseInt(item.productId) },
           data: {
             stock: {
-              decrement: parseInt(item.quantity)
+              decrement: parseFloat(item.quantity)
             }
           }
         });
@@ -266,6 +272,8 @@ exports.updateSalesOrder = async (req, res) => {
       id: updatedOrder.id,
       orderNumber: updatedOrder.orderNumber,
       customerName: updatedOrder.customer.name,
+      customerContact: updatedOrder.customer.contact,
+      customerPhone: updatedOrder.customer.phone,
       createdAt: updatedOrder.createdAt.toISOString().split('T')[0],
       status: updatedOrder.status,
       remark: updatedOrder.remark,

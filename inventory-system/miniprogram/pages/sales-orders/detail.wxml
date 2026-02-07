@@ -16,6 +16,14 @@
           <text class="info-value">{{order.customerName}}</text>
         </view>
         <view class="info-row">
+          <text class="info-label">联系人:</text>
+          <text class="info-value">{{order.customerContact || '-'}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">电话:</text>
+          <text class="info-value">{{order.customerPhone || '-'}}</text>
+        </view>
+        <view class="info-row">
           <text class="info-label">日期:</text>
           <text class="info-value">{{order.createdAt}}</text>
         </view>

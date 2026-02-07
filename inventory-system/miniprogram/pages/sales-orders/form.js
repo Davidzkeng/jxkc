@@ -150,7 +150,7 @@ Page({
 
   onQuantityChange(e) {
     const index = e.currentTarget.dataset.index;
-    const quantity = parseInt(e.detail.value) || 0;
+    const quantity = parseFloat(e.detail.value) || 0;
     const selectedProducts = this.data.selectedProducts;
     
     // 创建新数组，避免直接修改原数组
@@ -175,7 +175,7 @@ Page({
     const updatedProducts = [...selectedProducts];
     updatedProducts[index] = {
       ...updatedProducts[index],
-      quantity: (updatedProducts[index].quantity || 0) + 1
+      quantity: (updatedProducts[index].quantity || 0) + 0.5
     };
     
     this.setData({
@@ -193,7 +193,7 @@ Page({
     const updatedProducts = [...selectedProducts];
     updatedProducts[index] = {
       ...updatedProducts[index],
-      quantity: Math.max((updatedProducts[index].quantity || 0) - 1, 1) // 确保数量不小于1
+      quantity: Math.max((updatedProducts[index].quantity || 0) - 0.5, 0.5) // 确保数量不小于0.5斤
     };
     
     this.setData({

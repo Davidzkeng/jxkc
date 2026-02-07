@@ -39,7 +39,7 @@
             <text class="value price">¥{{item.price}}</text>
           </view>
           <view class="product-row">
-            <text class="label">库存:</text>
+            <text class="label">库存(斤):</text>
             <text class="value stock {{item.stock < 10 ? 'warning' : ''}}">{{item.stock}}</text>
           </view>
         </view>

@@ -1,220 +1,241 @@
 .print-container {
-  padding: 20rpx;
+  padding: 30rpx;
   background-color: #fff;
   font-size: 28rpx;
-  line-height: 1.5;
+  line-height: 1.4;
+  font-family: "SimSun", "宋体", serif;
+  box-sizing: border-box;
+  width: 100%;
 }
 
-/* 打印抬头 */
-.print-header {
+/* 销售单标题 */
+.print-title {
   text-align: center;
-  padding: 20rpx 0;
-  margin-bottom: 30rpx;
-  border-bottom: 2rpx solid #000;
-}
-
-.company-name {
   font-size: 48rpx;
   font-weight: bold;
-  color: #000;
-  display: block;
-  margin-bottom: 10rpx;
-}
-
-.company-info {
-  font-size: 36rpx;
-  font-weight: bold;
-  color: #000;
-  display: block;
-  margin-bottom: 10rpx;
-}
-
-.company-contact {
-  font-size: 24rpx;
-  color: #666;
-  display: block;
-}
-
-/* 订单基本信息 */
-.order-info {
   margin-bottom: 30rpx;
-  padding: 20rpx;
-  background-color: #f5f5f5;
-  border-radius: 10rpx;
+  letter-spacing: 30rpx;
 }
 
-.info-row {
+/* 表头信息 */
+.header-info {
+  margin-bottom: 20rpx;
+}
+
+.header-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10rpx;
+  margin-bottom: 15rpx;
 }
 
-.info-row:last-child {
-  margin-bottom: 0;
+.header-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
-.info-label {
-  font-weight: bold;
-  color: #333;
+.header-item.right {
+  justify-content: flex-start;
+  padding-left: 40rpx;
 }
 
-.info-value {
-  color: #666;
+.header-item .label {
+  font-weight: normal;
+  margin-right: 10rpx;
+  white-space: nowrap;
+  font-size: 28rpx;
 }
 
-.status {
-  color: #28a745;
+.header-item .value {
+  flex: 1;
+  border-bottom: 1rpx solid #000;
+  padding-bottom: 2rpx;
+  min-width: 250rpx;
+  font-size: 28rpx;
 }
 
 /* 商品明细表格 */
 .products-table {
-  margin-bottom: 30rpx;
   border: 2rpx solid #000;
-  border-radius: 10rpx;
-  overflow: hidden;
+  margin-bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .table-header {
   display: flex;
-  background-color: #f0f0f0;
-  font-weight: bold;
   border-bottom: 2rpx solid #000;
+  background-color: #fff;
+  width: 100%;
 }
 
+.th {
+  padding: 15rpx 5rpx;
+  text-align: center;
+  font-weight: normal;
+  border-right: 1rpx solid #000;
+  box-sizing: border-box;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.th:last-child {
+  border-right: none;
+}
+
+/* 表格列宽 - 删除规格列后重新分配 */
+.th-index { width: 14%; }
+.th-name { width: 28%; }
+.th-qty { width: 12%; }
+.th-unit { width: 10%; }
+.th-price { width: 16%; }
+.th-amount { width: 16%; }
+.th-remark { width: 4%; }
+
 .table-body {
-  background-color: #fff;
+  min-height: 480rpx;
 }
 
 .table-row {
   display: flex;
-  border-bottom: 1rpx solid #ddd;
+  border-bottom: 1rpx solid #000;
+  min-height: 60rpx;
+  width: 100%;
 }
 
 .table-row:last-child {
   border-bottom: none;
 }
 
-.table-cell {
-  padding: 15rpx;
+.table-row.empty-row {
+  border-bottom: 1rpx solid #ccc;
+}
+
+.td {
+  padding: 12rpx 5rpx;
   text-align: center;
+  border-right: 1rpx solid #000;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
   word-break: break-all;
+  overflow: hidden;
 }
 
-.index {
-  width: 80rpx;
+.td:last-child {
+  border-right: none;
 }
 
-.name {
-  flex: 2;
+.td-index { 
+  width: 14%; 
+}
+.td-name { 
+  width: 28%; 
   text-align: left;
+  justify-content: flex-start;
+  padding-left: 10rpx;
+}
+.td-qty { 
+  width: 12%; 
+}
+.td-unit { 
+  width: 10%; 
+}
+.td-price { 
+  width: 16%; 
+}
+.td-amount { 
+  width: 16%; 
+}
+.td-remark { 
+  width: 4%; 
 }
 
-.code {
-  flex: 1;
-}
-
-.quantity {
-  width: 120rpx;
-}
-
-.price {
-  width: 120rpx;
-}
-
-.total {
-  width: 120rpx;
-  font-weight: bold;
-  color: #dc3545;
-}
-
-/* 总计信息 */
-.summary {
-  margin-bottom: 30rpx;
-  padding: 20rpx;
-  background-color: #f5f5f5;
-  border-radius: 10rpx;
+/* 汇总信息 */
+.summary-section {
+  border: 2rpx solid #000;
+  border-top: none;
+  margin-bottom: 20rpx;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .summary-row {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 10rpx;
+  border-bottom: 1rpx solid #000;
+  min-height: 70rpx;
 }
 
 .summary-row:last-child {
-  margin-bottom: 0;
+  border-bottom: none;
 }
 
-.summary-label {
+.summary-item {
+  display: flex;
+  align-items: center;
+  padding: 15rpx 20rpx;
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.summary-item:first-child {
+  border-right: 1rpx solid #000;
+}
+
+.summary-item .label {
+  margin-right: 10rpx;
+  white-space: nowrap;
+}
+
+.summary-item .value {
+  flex: 1;
+}
+
+.summary-item .value.amount {
   font-weight: bold;
+  font-size: 32rpx;
+}
+
+/* 底部说明 */
+.footer-note {
+  margin-top: 25rpx;
+  padding: 10rpx 0;
+}
+
+.note-text {
+  font-size: 24rpx;
   color: #333;
-}
-
-.summary-value {
-  color: #666;
-  font-weight: bold;
-}
-
-.total-row {
-  border-top: 2rpx solid #000;
-  padding-top: 10rpx;
-  margin-top: 10rpx;
-}
-
-.total-amount {
-  color: #dc3545;
-  font-size: 36rpx;
-}
-
-/* 备注 */
-.remark {
-  margin-bottom: 30rpx;
-  padding: 20rpx;
-  background-color: #f8f9fa;
-  border-left: 8rpx solid #6c757d;
-  border-radius: 10rpx;
-}
-
-.remark-label {
-  font-weight: bold;
-  color: #333;
-  display: block;
-  margin-bottom: 10rpx;
-}
-
-.remark-content {
-  color: #666;
-  line-height: 1.6;
 }
 
 /* 操作按钮 */
 .actions {
   display: flex;
-  justify-content: space-around;
-  margin-top: 40rpx;
+  justify-content: center;
+  margin-top: 50rpx;
+  gap: 40rpx;
 }
 
 .action-btn {
-  width: 200rpx;
-  height: 80rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32rpx;
-  border-radius: 40rpx;
-  margin: 0 10rpx;
+  width: 220rpx;
+  height: 90rpx;
+  line-height: 90rpx;
+  font-size: 34rpx;
+  border-radius: 8rpx;
+  margin: 0;
 }
 
 .print-btn {
   background-color: #007bff;
   color: #fff;
-  border: none;
 }
 
 .back-btn {
   background-color: #6c757d;
   color: #fff;
-  border: none;
 }
 
 /* 打印样式 */
@@ -222,16 +243,8 @@
   .actions {
     display: none;
   }
-  
+
   .print-container {
-    padding: 0;
-  }
-  
-  .order-info,
-  .products-table,
-  .summary,
-  .remark {
-    box-shadow: none;
-    border: 1px solid #000;
+    padding: 20rpx;
   }
 }

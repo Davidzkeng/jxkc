@@ -80,7 +80,7 @@
               data-product="{{item}}"
             >
               <text class="result-name">{{item.name}}</text>
-              <text class="result-code">编码: {{item.code}} | 库存: {{item.stock}}</text>
+              <text class="result-code">编码: {{item.code}} | 库存: {{item.stock}}斤</text>
             </view>
             <view class="result-item empty" wx:if="{{filteredProducts.length === 0}}">
               <text>暂无商品</text>

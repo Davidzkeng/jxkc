@@ -101,8 +101,8 @@
     </view>
 
     <view class="form-item">
-      <text class="form-label">入库数量 *</text>
-      <input class="form-input" type="number" value="{{quantity}}" bindinput="onQuantityChange" placeholder="请输入入库数量" />
+      <text class="form-label">入库数量(斤) *</text>
+      <input class="form-input" type="digit" value="{{quantity}}" bindinput="onQuantityChange" placeholder="请输入入库数量(斤)" />
     </view>
 
     <view class="form-item">

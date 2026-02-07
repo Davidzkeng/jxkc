@@ -189,7 +189,7 @@ Page({
     }
 
     if (!this.data.quantity) {
-      util.showError('请输入数量');
+      util.showError('请输入入库数量(斤)');
       return;
     }
 
@@ -198,7 +198,7 @@ Page({
       return;
     }
 
-    const quantity = parseInt(this.data.quantity);
+    const quantity = parseFloat(this.data.quantity);
     const price = parseFloat(this.data.price);
     const totalAmount = quantity * price;
 

@@ -25,7 +25,7 @@
             <text class="value">{{item.customer.name}}</text>
           </view>
           <view class="record-row">
-            <text class="label">数量:</text>
+            <text class="label">数量(斤):</text>
             <text class="value quantity">-{{item.quantity}}</text>
           </view>
           <view class="record-row">

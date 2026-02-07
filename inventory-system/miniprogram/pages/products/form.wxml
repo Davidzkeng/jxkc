@@ -30,8 +30,8 @@
     </view>
 
     <view class="form-item">
-      <text class="form-label">商品库存 *</text>
-      <input class="form-input" type="number" value="{{stock}}" bindinput="onStockChange" placeholder="请输入商品库存" />
+      <text class="form-label">商品库存(斤) *</text>
+      <input class="form-input" type="digit" value="{{stock}}" bindinput="onStockChange" placeholder="请输入商品库存(斤)" />
     </view>
 
     <view class="form-item">
