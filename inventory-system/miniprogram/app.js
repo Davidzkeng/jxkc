@@ -2,8 +2,8 @@
 App({
   globalData: {
     // API基础URL，请根据实际情况修改
-    baseUrl: 'http://localhost:3001/api',
-    // baseUrl: 'http://159.75.245.32:3001/api',
+    // baseUrl: 'http://localhost:3001/api',
+    baseUrl: 'http://159.75.245.32:3001/api',
     userInfo: null
   },
 
