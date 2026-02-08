@@ -5,19 +5,14 @@ Page({
   data: {
     // 原始数据
     products: [],
-    suppliers: [],
     
     // 选中的数据
     selectedProduct: null,
-    selectedSupplier: null,
     
     // 搜索相关
     productSearchKey: '',
-    supplierSearchKey: '',
     filteredProducts: [],
-    filteredSuppliers: [],
     showProductList: false,
-    showSupplierList: false,
     
     // 表单数据
     quantity: '',
@@ -33,10 +28,9 @@ Page({
 
   loadData(options) {
     this.setData({ loading: true });
-    Promise.all([api.getProducts(), api.getSuppliers()])
-      .then(([productsRes, suppliersRes]) => {
+    api.getProducts()
+      .then((productsRes) => {
         const products = Array.isArray(productsRes) ? productsRes : [];
-        const suppliers = Array.isArray(suppliersRes) ? suppliersRes : [];
         
         let selectedProduct = null;
         
@@ -48,9 +42,7 @@ Page({
         
         this.setData({
           products: products,
-          suppliers: suppliers,
           filteredProducts: products,
-          filteredSuppliers: suppliers,
           selectedProduct: selectedProduct,
           loading: false
         });
@@ -94,8 +86,7 @@ Page({
 
   toggleProductList() {
     this.setData({
-      showProductList: !this.data.showProductList,
-      showSupplierList: false
+      showProductList: !this.data.showProductList
     });
   },
 
@@ -111,49 +102,6 @@ Page({
   clearSelectedProduct() {
     this.setData({
       selectedProduct: null
-    });
-  },
-
-  // 供应商搜索
-  onSupplierSearchInput(e) {
-    const searchKey = e.detail.value;
-    this.setData({
-      supplierSearchKey: searchKey,
-      showSupplierList: true,
-      filteredSuppliers: this.filterSuppliers(searchKey)
-    });
-  },
-
-  filterSuppliers(searchKey) {
-    if (!searchKey) {
-      return this.data.suppliers;
-    }
-    return this.data.suppliers.filter(supplier => 
-      supplier.name.toLowerCase().includes(searchKey.toLowerCase()) ||
-      supplier.contact.toLowerCase().includes(searchKey.toLowerCase()) ||
-      supplier.phone.includes(searchKey)
-    );
-  },
-
-  toggleSupplierList() {
-    this.setData({
-      showSupplierList: !this.data.showSupplierList,
-      showProductList: false
-    });
-  },
-
-  selectSupplier(e) {
-    const supplier = e.currentTarget.dataset.supplier;
-    this.setData({
-      selectedSupplier: supplier,
-      showSupplierList: false,
-      supplierSearchKey: ''
-    });
-  },
-
-  clearSelectedSupplier() {
-    this.setData({
-      selectedSupplier: null
     });
   },
 
@@ -183,8 +131,9 @@ Page({
       return;
     }
 
-    if (!this.data.selectedSupplier) {
-      util.showError('请选择供应商');
+    // 检查商品是否有供应商
+    if (!this.data.selectedProduct.supplierId && !this.data.selectedProduct.supplier) {
+      util.showError('该商品未设置供应商，请先编辑商品设置供应商');
       return;
     }
 
@@ -201,10 +150,11 @@ Page({
     const quantity = parseFloat(this.data.quantity);
     const price = parseFloat(this.data.price);
     const totalAmount = quantity * price;
+    const supplierId = this.data.selectedProduct.supplierId || this.data.selectedProduct.supplier.id;
 
     const data = {
       productId: this.data.selectedProduct.id,
-      supplierId: this.data.selectedSupplier.id,
+      supplierId: supplierId,
       quantity: quantity,
       price: price,
       totalAmount: totalAmount

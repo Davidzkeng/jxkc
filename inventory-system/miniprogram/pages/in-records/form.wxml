@@ -52,51 +52,11 @@
       </view>
     </view>
 
-    <!-- 供应商搜索选择 -->
-    <view class="form-item">
-      <text class="form-label">选择供应商 *</text>
-      <view class="search-picker-container">
-        <view class="search-input-wrapper">
-          <input 
-            class="search-input" 
-            placeholder="搜索供应商..." 
-            value="{{supplierSearchKey}}" 
-            bindinput="onSupplierSearchInput" 
-          />
-        </view>
-        <view 
-          class="selected-item" 
-          wx:if="{{selectedSupplier}}"
-        >
-          <text class="selected-text">{{selectedSupplier.name}}</text>
-          <text class="clear-btn" bindtap="clearSelectedSupplier">×</text>
-        </view>
-        <view 
-          class="selected-item placeholder" 
-          wx:else
-          bindtap="toggleSupplierList"
-        >
-          <text>请选择供应商</text>
-        </view>
-        
-        <!-- 供应商列表 -->
-        <view class="search-results" wx:if="{{showSupplierList}}">
-          <scroll-view scroll-y="true" style="max-height: 400rpx;">
-            <view 
-              class="result-item" 
-              wx:for="{{filteredSuppliers}}" 
-              wx:key="id"
-              bindtap="selectSupplier"
-              data-supplier="{{item}}"
-            >
-              <text class="result-name">{{item.name}}</text>
-              <text class="result-contact">{{item.contact}} - {{item.phone}}</text>
-            </view>
-            <view class="result-item empty" wx:if="{{filteredSuppliers.length === 0}}">
-              <text>暂无供应商</text>
-            </view>
-          </scroll-view>
-        </view>
+    <!-- 供应商信息（自动显示，不可编辑） -->
+    <view class="form-item" wx:if="{{selectedProduct}}">
+      <text class="form-label">供应商</text>
+      <view class="form-input" style="background-color: #f5f5f5; color: #666;">
+        {{selectedProduct.supplier ? selectedProduct.supplier.name : '未设置供应商'}}
       </view>
     </view>
 

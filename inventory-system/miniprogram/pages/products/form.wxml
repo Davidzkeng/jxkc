@@ -25,6 +25,16 @@
     </view>
 
     <view class="form-item">
+      <text class="form-label">供应商 *</text>
+      <picker mode="selector" range="{{suppliers}}" range-key="name" value="{{supplierId}}" bindchange="onSupplierChange">
+        <view class="form-picker">
+          {{supplierId >= 0 && suppliers[supplierId] ? suppliers[supplierId].name : '请选择供应商'}}
+          <text class="arrow">></text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
       <text class="form-label">商品价格 *</text>
       <input class="form-input" type="digit" value="{{price}}" bindinput="onPriceChange" placeholder="请输入商品价格" />
     </view>

@@ -32,8 +32,10 @@ model Product {
   code             String           @unique
   categoryId       Int
   category         Category         @relation(fields: [categoryId], references: [id])
+  supplierId       Int?
+  supplier         Supplier?        @relation(fields: [supplierId], references: [id])
   price            Decimal          @default(0.00)
-  stock            Int              @default(0)
+  stock            Float            @default(0)
   description      String?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
@@ -66,6 +68,7 @@ model Supplier {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   inRecords   InRecord[]
+  products    Product[]
 }
 
 // 入库单模型

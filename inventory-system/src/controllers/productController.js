@@ -4,7 +4,10 @@ import prisma from '../server/prisma.js';
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await prisma.product.findMany({
-      include: { category: true }
+      include: { 
+        category: true,
+        supplier: true
+      }
     });
     res.json(products);
   } catch (error) {
@@ -18,7 +21,10 @@ exports.getProductById = async (req, res) => {
     const { id } = req.params;
     const product = await prisma.product.findUnique({
       where: { id: parseInt(id) },
-      include: { category: true }
+      include: { 
+        category: true,
+        supplier: true
+      }
     });
     if (!product) {
       return res.status(404).json({ error: '商品不存在' });
@@ -32,9 +38,17 @@ exports.getProductById = async (req, res) => {
 // 创建商品
 exports.createProduct = async (req, res) => {
   try {
-    const { name, code, categoryId, price, stock, description } = req.body;
+    const { name, code, categoryId, supplierId, price, stock, description } = req.body;
     const product = await prisma.product.create({
-      data: { name, code, categoryId, price, stock, description }
+      data: { 
+        name, 
+        code, 
+        categoryId: parseInt(categoryId), 
+        supplierId: supplierId ? parseInt(supplierId) : null, 
+        price: parseFloat(price), 
+        stock: parseFloat(stock), 
+        description 
+      }
     });
     res.json(product);
   } catch (error) {
@@ -46,10 +60,18 @@ exports.createProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, code, categoryId, price, stock, description } = req.body;
+    const { name, code, categoryId, supplierId, price, stock, description } = req.body;
     const product = await prisma.product.update({
       where: { id: parseInt(id) },
-      data: { name, code, categoryId, price, stock, description }
+      data: { 
+        name, 
+        code, 
+        categoryId: parseInt(categoryId), 
+        supplierId: supplierId ? parseInt(supplierId) : null, 
+        price: parseFloat(price), 
+        stock: parseFloat(stock), 
+        description 
+      }
     });
     res.json(product);
   } catch (error) {
@@ -100,4 +122,3 @@ exports.getStockStats = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-

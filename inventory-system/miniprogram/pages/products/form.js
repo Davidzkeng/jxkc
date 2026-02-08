@@ -8,10 +8,13 @@ Page({
     code: '',
     categoryId: -1,
     categoryIdValue: '',
+    supplierId: -1,
+    supplierIdValue: '',
     price: '',
     stock: '',
     description: '',
     categories: [],
+    suppliers: [],
     loading: false,
     submitLoading: false
   },
@@ -49,6 +52,8 @@ Page({
     }
     console.log('加载类别列表');
     this.loadCategories();
+    console.log('加载供应商列表');
+    this.loadSuppliers();
   },
 
   loadProductDetail(id) {
@@ -60,6 +65,7 @@ Page({
           name: product.name,
           code: product.code,
           categoryIdValue: product.categoryId,
+          supplierIdValue: product.supplierId,
           price: product.price,
           stock: product.stock,
           description: product.description,
@@ -100,6 +106,32 @@ Page({
       });
   },
 
+  loadSuppliers() {
+    console.log('===== loadSuppliers 开始 =====');
+    api.getSuppliers()
+      .then(res => {
+        console.log('loadSuppliers 成功:', res);
+        const suppliers = Array.isArray(res) ? res : [];
+        let supplierIdIndex = 0;
+        if (this.data.supplierIdValue) {
+          const index = suppliers.findIndex(s => s.id === this.data.supplierIdValue);
+          if (index !== -1) {
+            supplierIdIndex = index;
+          }
+        } else if (suppliers.length > 0) {
+          this.setData({ supplierIdValue: suppliers[0].id });
+        }
+        this.setData({
+          suppliers: suppliers,
+          supplierId: supplierIdIndex
+        });
+      })
+      .catch(err => {
+        console.error('加载供应商列表失败', err);
+        this.setData({ suppliers: [] });
+      });
+  },
+
   onNameChange(e) {
     this.setData({ name: e.detail.value });
   },
@@ -114,6 +146,15 @@ Page({
     this.setData({
       categoryId: index,
       categoryIdValue: category ? category.id : -1
+    });
+  },
+
+  onSupplierChange(e) {
+    const index = e.detail.value;
+    const supplier = this.data.suppliers[index];
+    this.setData({
+      supplierId: index,
+      supplierIdValue: supplier ? supplier.id : -1
     });
   },
 
@@ -147,6 +188,11 @@ Page({
       return;
     }
 
+    if (this.data.supplierId === -1) {
+      util.showError('请选择供应商');
+      return;
+    }
+
     if (!this.data.price) {
       util.showError('请输入商品价格');
       return;
@@ -161,6 +207,7 @@ Page({
       name: this.data.name,
       code: this.data.code,
       categoryId: this.data.categoryIdValue,
+      supplierId: this.data.supplierIdValue,
       price: parseFloat(this.data.price),
       stock: parseFloat(this.data.stock),
       description: this.data.description
