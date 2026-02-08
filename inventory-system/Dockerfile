@@ -66,4 +66,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Run Prisma migrations and start server
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db push && npm run server"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db push --accept-data-loss && npm run server"]

@@ -117,5 +117,11 @@ module.exports = {
   getSalesOrderById: (id) => request({ url: `/sales-orders/${id}`, method: 'GET' }),
   createSalesOrder: (data) => request({ url: '/sales-orders', method: 'POST', data }),
   updateSalesOrder: (id, data) => request({ url: `/sales-orders/${id}`, method: 'PUT', data }),
-  deleteSalesOrder: (id) => request({ url: `/sales-orders/${id}`, method: 'DELETE' })
+  deleteSalesOrder: (id) => request({ url: `/sales-orders/${id}`, method: 'DELETE' }),
+
+  // 打印任务相关API
+  createPrintJob: (data) => request({ url: '/print-jobs', method: 'POST', data }),
+  getPendingPrintJobs: () => request({ url: '/print-jobs/pending', method: 'GET' }),
+  getPrintJobById: (id) => request({ url: `/print-jobs/${id}`, method: 'GET' }),
+  updatePrintJobStatus: (id, data) => request({ url: `/print-jobs/${id}/status`, method: 'PUT', data })
 };

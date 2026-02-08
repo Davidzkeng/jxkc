@@ -124,6 +124,7 @@ model SalesOrder {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   products    SalesOrderProduct[]
+  printJobs   PrintJob[]
 }
 
 // 销售单商品关联模型
@@ -150,4 +151,19 @@ model SystemSetting {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// 打印任务模型
+model PrintJob {
+  id            Int      @id @default(autoincrement())
+  orderId       Int
+  order         SalesOrder @relation(fields: [orderId], references: [id])
+  status        String   @default("pending") // pending, processing, completed, failed
+  printerName   String?
+  errorMessage  String?
+  printedAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status, createdAt])
 }

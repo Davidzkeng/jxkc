@@ -1,6 +1,22 @@
 const api = require('../../utils/api.js');
 const util = require('../../utils/util.js');
 
+// 显示成功提示
+function showSuccess(message) {
+  wx.showToast({
+    title: message,
+    icon: 'success'
+  });
+}
+
+// 显示错误提示
+function showError(message) {
+  wx.showToast({
+    title: message,
+    icon: 'none'
+  });
+}
+
 Page({
   data: {
     order: null,
@@ -165,64 +181,42 @@ Page({
   print() {
     const order = this.data.order;
     if (!order) {
-      util.showError('销售单信息未加载');
+      showError('销售单信息未加载');
+      return;
+    }
+
+    if (!order.id) {
+      showError('订单ID无效');
       return;
     }
 
     wx.showLoading({
-      title: '准备打印...',
+      title: '创建打印任务...',
     });
 
-    // 构建打印内容
-    let printContent = '销售单\n\n';
-    printContent += `客户名称: ${order.customerName || ''}\n`;
-    printContent += `电话: ${order.customerContact || ''} ${order.customerPhone || ''}\n`;
-    printContent += `单号: ${order.orderNumber || ''}\n`;
-    printContent += `日期: ${order.createdAt || ''}\n\n`;
-
-    printContent += '编号  品名          规格      数量  单位  单价    金额      备注\n';
-    printContent += '----------------------------------------------------------------\n';
-
-    if (order.products && order.products.length > 0) {
-      order.products.forEach(item => {
-        const code = (item.code || '').padEnd(6, ' ');
-        const name = (item.name || '').substring(0, 10).padEnd(12, ' ');
-        const spec = (item.specification || '').padEnd(8, ' ');
-        const qty = String(item.quantity || '').padStart(4, ' ');
-        const unit = '斤'.padEnd(4, ' ');
-        const price = (item.price ? '¥' + item.price : '').padStart(6, ' ');
-        const amount = (item.totalAmount ? '¥' + item.totalAmount : '').padStart(8, ' ');
-        const remark = (item.remark || '').substring(0, 6);
-        printContent += `${code} ${name} ${spec} ${qty}  ${unit} ${price} ${amount} ${remark}\n`;
-      });
-    }
-
-    printContent += '----------------------------------------------------------------\n';
-    printContent += `本页货款: ¥${order.totalAmount || '0.00'}\n`;
-    printContent += `本单货款(大写): ${order.totalAmountInChinese || ''}\n`;
-    printContent += `前欠款: ${order.previousDebt ? '¥' + order.previousDebt : '0.00'}\n`;
-    printContent += `经手人: ${order.operator || ''}\n\n`;
-    printContent += '注: 货物当面点清，过后概不负责。\n';
-
-    wx.hideLoading();
-
-    // 显示打印内容
-    wx.showModal({
-      title: '打印内容',
-      content: printContent,
-      confirmText: '复制',
-      cancelText: '取消',
-      success: (res) => {
-        if (res.confirm) {
-          wx.setClipboardData({
-            data: printContent,
+    // 调用API创建打印任务
+    api.createPrintJob({ orderId: order.id })
+      .then(res => {
+        wx.hideLoading();
+        if (res.success) {
+          wx.showModal({
+            title: '打印任务已创建',
+            content: '打印任务已提交到服务器，请等待打印完成',
+            showCancel: false,
+            confirmText: '确定',
             success: () => {
-              util.showSuccess('已复制到剪贴板');
+              showSuccess('打印任务创建成功');
             }
           });
+        } else {
+          showError(res.error || '创建打印任务失败');
         }
-      }
-    });
+      })
+      .catch(err => {
+        wx.hideLoading();
+        console.error('创建打印任务失败:', err);
+        showError('创建打印任务失败');
+      });
   },
 
   goBack() {

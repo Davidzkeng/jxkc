@@ -1,0 +1,19 @@
+[Unit]
+Description=Inventory Print Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/print-service
+Environment="PRINT_API_URL=http://localhost:3001/api"
+Environment="PRINT_POLL_INTERVAL=5"
+ExecStart=/usr/bin/python3 /opt/print-service/print_service_api.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=print-service
+
+[Install]
+WantedBy=multi-user.target
