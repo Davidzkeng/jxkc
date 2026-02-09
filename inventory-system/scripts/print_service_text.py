@@ -32,12 +32,13 @@ def cut_text(text, width):
 
 
 def center_text(text, width):
-    """居中显示文本"""
+    """居中显示文本，确保返回指定宽度的字符串"""
     text = str(text)
     if len(text) >= width:
-        return cut_text(text, width)
+        return text[:width]
     left = (width - len(text)) // 2
-    return ' ' * left + text + ' ' * (width - left - len(text))
+    right = width - left - len(text)
+    return ' ' * left + text + ' ' * right
 
 
 def left_text(text, width):
@@ -63,36 +64,7 @@ def create_print_content(job):
     customer = order.get("customer", {})
     
     # 240mm纸张，每字符4mm，总宽度60字符
-    # 表格设计：总宽度56字符（包含边框），左右各留2字符边距
-    COL_NO = 4      # 序号
-    COL_NAME = 18   # 品名
-    COL_QTY = 6     # 数量
-    COL_PRICE = 10  # 单价
-    COL_AMT = 10    # 金额
-    COL_REMARK = 4  # 备注
-    
-    # 表格总宽度计算
-    # | 序号 | 品名 | 数量 | 单价 | 金额 | 备注 |
-    # 7个分隔符 + 6列内容 + 12个空格（每列前后各1空格）
-    content_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK
-    separator_width = 7   # 7个 |
-    space_width = 12      # 6列 × 2空格
-    table_width = content_width + separator_width + space_width  # = 71? 不对
-    
-    # 重新计算：实际格式是 "| 内容 | 内容 |"
-    # 每个单元格：| + 空格 + 内容 + 空格
-    # 总宽度 = 7个| + 6列内容 + 12个空格 = 7 + 52 + 12 = 71，这超过了60
-    
-    # 调整列宽，使总宽度 <= 56（留出边距）
-    COL_NO = 4      # 序号
-    COL_NAME = 14   # 品名
-    COL_QTY = 5     # 数量
-    COL_PRICE = 8   # 单价
-    COL_AMT = 8     # 金额
-    COL_REMARK = 4  # 备注
-    
-    # 总宽度 = 7 + (4+14+5+8+8+4) + 12 = 7 + 43 + 12 = 62，还是超了
-    # 再调整
+    # 表格总宽度 = 7个| + 6列内容 + 12个空格 = 58字符
     COL_NO = 3      # 序号
     COL_NAME = 12   # 品名
     COL_QTY = 5     # 数量
@@ -100,9 +72,9 @@ def create_print_content(job):
     COL_AMT = 8     # 金额
     COL_REMARK = 3  # 备注
     
-    # 总宽度 = 7 + 39 + 12 = 58，可以
+    # 计算表格总宽度
     content_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK
-    table_width = 7 + content_width + 12  # 7个| + 内容 + 12个空格
+    table_width = 7 + content_width + 12  # 7个| + 内容 + 12个空格 = 58
     
     # 左侧边距 = (60 - 58) // 2 = 1
     left_margin = (PAGE_WIDTH - table_width) // 2
@@ -148,15 +120,15 @@ def create_print_content(job):
     # 表头分隔线
     lines.append(page_start + "-" * (table_width - 2))
     
-    # 商品明细
+    # 商品明细 - 表身数据与表头严格对齐
     total_qty = 0
     for idx, item in enumerate(products, 1):
         product = item.get("product", {})
-        name = product.get('name', '')[:COL_NAME-1]
+        name = product.get('name', '')[:COL_NAME]
         qty = str(item.get('quantity', 0))
         price = f"{float(item.get('price', 0)):.2f}"
         amount = f"{float(item.get('totalAmount', 0)):.2f}"
-        remark = item.get('remark', '')[:COL_REMARK-1]
+        remark = item.get('remark', '')[:COL_REMARK]
         
         # 数据行：所有字段居中对齐，与表头保持一致
         row = page_start + f"|{center_text(str(idx), COL_NO)}|{center_text(name, COL_NAME)}|{center_text(qty, COL_QTY)}|{center_text(price, COL_PRICE)}|{center_text(amount, COL_AMT)}|{center_text(remark, COL_REMARK)}|"
