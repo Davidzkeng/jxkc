@@ -104,14 +104,15 @@ def create_print_content(job):
     
     # 分隔线
     lines.append("")
-    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
     # ========== 表格区域 ==========
-    header = page_start + f"|{center_text('序号', COL_NO-2)} |{center_text('商品名称', COL_NAME-2)} |{center_text('数量', COL_QTY-2)} |{center_text('销售单价', COL_PRICE-2)} |{center_text('销售金额', COL_AMT-2)} |"
+    # 表头使用与表身相同的对齐方式：序号右对齐，品名左对齐，数量和金额右对齐
+    header = page_start + f"|{right_text('序号', COL_NO-2)} |{left_text('商品名称', COL_NAME-2)} |{right_text('数量', COL_QTY-2)} |{right_text('销售单价', COL_PRICE-2)} |{right_text('销售金额', COL_AMT-2)} |"
     lines.append(header)
     
     # 表头分隔线
-    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
     # 商品明细
     total_qty = 0
@@ -127,7 +128,7 @@ def create_print_content(job):
         total_qty += item.get('quantity', 0)
     
     # 表尾分隔线
-    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
     # ========== 汇总区域 ==========
     total_amount = float(order.get('totalAmount', 0))
@@ -143,7 +144,7 @@ def create_print_content(job):
     
     # ========== 底部区域 ==========
     lines.append("")
-    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     lines.append("")
     lines.append(page_start + "客户签名: ______________________      日    期: ________________")
     lines.append("")
