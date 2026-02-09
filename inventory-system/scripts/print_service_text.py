@@ -158,8 +158,8 @@ def create_print_content(job):
         amount = f"{float(item.get('totalAmount', 0)):.2f}"
         remark = item.get('remark', '')[:COL_REMARK-1]
         
-        # 数据行：序号右对齐，品名左对齐，数值右对齐，备注左对齐
-        row = page_start + f"|{right_text(str(idx), COL_NO)}|{left_text(name, COL_NAME)}|{right_text(qty, COL_QTY)}|{right_text(price, COL_PRICE)}|{right_text(amount, COL_AMT)}|{left_text(remark, COL_REMARK)}|"
+        # 数据行：所有字段居中对齐，与表头保持一致
+        row = page_start + f"|{center_text(str(idx), COL_NO)}|{center_text(name, COL_NAME)}|{center_text(qty, COL_QTY)}|{center_text(price, COL_PRICE)}|{center_text(amount, COL_AMT)}|{center_text(remark, COL_REMARK)}|"
         lines.append(row)
         total_qty += item.get('quantity', 0)
     
