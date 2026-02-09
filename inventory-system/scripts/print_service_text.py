@@ -62,16 +62,20 @@ def create_print_content(job):
     products = order.get("products", [])
     customer = order.get("customer", {})
     
-    # 固定列宽设计 - 除商品名称外，其他字段等宽
-    COL_NO = 8      # 序号
-    COL_NAME = 24   # 品名（更宽）
-    COL_QTY = 8     # 数量
-    COL_PRICE = 10  # 单价
-    COL_AMT = 12    # 金额
-    COL_REMARK = 8  # 备注
+    # 固定列宽设计 - 220mm纸张，每字符4mm，总宽度控制在55字符以内
+    COL_NO = 4      # 序号
+    COL_NAME = 16   # 品名（最宽）
+    COL_QTY = 6     # 数量
+    COL_PRICE = 8   # 单价
+    COL_AMT = 8     # 金额
+    COL_REMARK = 4  # 备注
     
-    # 表格总宽度（包含分隔符）
-    table_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK + 12  # +12 是分隔符 |
+    # 表格总宽度（包含分隔符 | 和空格）
+    # 格式: | 序号 | 品名 | 数量 | 单价 | 金额 | 备注 |
+    # 分隔符: 7个 |，每列前后各1空格
+    separator_width = 7  # 7个 |
+    space_width = 12     # 6列，每列2个空格（前后各1）
+    table_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK + separator_width + space_width
     
     # 计算左侧边距，使表格整体居中
     left_margin = (PAGE_WIDTH - table_width) // 2
