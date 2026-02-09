@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 打印服务脚本 - 纯文本表格版
-纸张宽度: 220mm (约80字符)
+纸张宽度: 240mm (60字符，每字符4mm)
 固定宽度表格，居中打印
 """
 
@@ -19,8 +19,8 @@ API_BASE_URL = os.environ.get("PRINT_API_URL", "http://localhost:3001/api")
 POLL_INTERVAL = int(os.environ.get("PRINT_POLL_INTERVAL", "5"))
 DEFAULT_PRINTER = os.environ.get("CUPS_PRINTER", "default")
 
-# 纸张宽度220mm，适合80字符（每字约2.75mm）
-PAGE_WIDTH = 80
+# 纸张宽度240mm，每字符4mm，总宽度60字符
+PAGE_WIDTH = 60
 
 
 def cut_text(text, width):
@@ -62,22 +62,49 @@ def create_print_content(job):
     products = order.get("products", [])
     customer = order.get("customer", {})
     
-    # 固定列宽设计 - 220mm纸张，每字符4mm，总宽度控制在55字符以内
+    # 240mm纸张，每字符4mm，总宽度60字符
+    # 表格设计：总宽度56字符（包含边框），左右各留2字符边距
     COL_NO = 4      # 序号
-    COL_NAME = 16   # 品名（最宽）
+    COL_NAME = 18   # 品名
     COL_QTY = 6     # 数量
+    COL_PRICE = 10  # 单价
+    COL_AMT = 10    # 金额
+    COL_REMARK = 4  # 备注
+    
+    # 表格总宽度计算
+    # | 序号 | 品名 | 数量 | 单价 | 金额 | 备注 |
+    # 7个分隔符 + 6列内容 + 12个空格（每列前后各1空格）
+    content_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK
+    separator_width = 7   # 7个 |
+    space_width = 12      # 6列 × 2空格
+    table_width = content_width + separator_width + space_width  # = 71? 不对
+    
+    # 重新计算：实际格式是 "| 内容 | 内容 |"
+    # 每个单元格：| + 空格 + 内容 + 空格
+    # 总宽度 = 7个| + 6列内容 + 12个空格 = 7 + 52 + 12 = 71，这超过了60
+    
+    # 调整列宽，使总宽度 <= 56（留出边距）
+    COL_NO = 4      # 序号
+    COL_NAME = 14   # 品名
+    COL_QTY = 5     # 数量
     COL_PRICE = 8   # 单价
     COL_AMT = 8     # 金额
     COL_REMARK = 4  # 备注
     
-    # 表格总宽度（包含分隔符 | 和空格）
-    # 格式: | 序号 | 品名 | 数量 | 单价 | 金额 | 备注 |
-    # 分隔符: 7个 |，每列前后各1空格
-    separator_width = 7  # 7个 |
-    space_width = 12     # 6列，每列2个空格（前后各1）
-    table_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK + separator_width + space_width
+    # 总宽度 = 7 + (4+14+5+8+8+4) + 12 = 7 + 43 + 12 = 62，还是超了
+    # 再调整
+    COL_NO = 3      # 序号
+    COL_NAME = 12   # 品名
+    COL_QTY = 5     # 数量
+    COL_PRICE = 8   # 单价
+    COL_AMT = 8     # 金额
+    COL_REMARK = 3  # 备注
     
-    # 计算左侧边距，使表格整体居中
+    # 总宽度 = 7 + 39 + 12 = 58，可以
+    content_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK
+    table_width = 7 + content_width + 12  # 7个| + 内容 + 12个空格
+    
+    # 左侧边距 = (60 - 58) // 2 = 1
     left_margin = (PAGE_WIDTH - table_width) // 2
     page_start = ' ' * left_margin
     
@@ -88,7 +115,7 @@ def create_print_content(job):
     lines.append(' ' * ((PAGE_WIDTH - len(title)) // 2) + title)
     lines.append(' ' * ((PAGE_WIDTH - len(title)) // 2) + "=" * len(title))
     
-    # ========== 客户信息区域 - 两行布局 ==========
+    # ========== 客户信息区域 ==========
     order_date = order.get('createdAt', '')
     if order_date:
         try:
@@ -97,58 +124,56 @@ def create_print_content(job):
         except:
             pass
     
-    # 第一行: 客户名称 (左) + 日期 (右)
-    left_info1 = f"客户名称: {customer.get('name', '')}"
+    # 客户名称和日期
+    left_info1 = f"客户: {customer.get('name', '')}"
     right_info1 = f"日期: {order_date}"
-    # 确保信息行与表格对齐
-    info_width = table_width - 2  # 减去一些边距
-    line1 = page_start + left_info1 + ' ' * (info_width - len(left_info1) - len(right_info1)) + right_info1
-    lines.append(line1)
+    info_line1 = page_start + left_info1 + ' ' * (table_width - len(left_info1) - len(right_info1) - 2) + right_info1
+    lines.append(info_line1)
     
-    # 第二行: 电话 (左) + 订单编号 (右)
+    # 电话和单号
     left_info2 = f"电话: {customer.get('phone', '')}"
-    right_info2 = f"订单编号: {order.get('orderNumber', '')[:20]}"
-    line2 = page_start + left_info2 + ' ' * (info_width - len(left_info2) - len(right_info2)) + right_info2
-    lines.append(line2)
+    right_info2 = f"单号: {order.get('orderNumber', '')[:16]}"
+    info_line2 = page_start + left_info2 + ' ' * (table_width - len(left_info2) - len(right_info2) - 2) + right_info2
+    lines.append(info_line2)
     
     # 分隔线
     lines.append("")
-    lines.append(page_start + "━" * (table_width - 2))
+    lines.append(page_start + "-" * (table_width - 2))
     
     # ========== 表格区域 ==========
-    # 表头使用居中对齐
-    header = page_start + f"|{center_text('序号', COL_NO-2)} |{center_text('商品名称', COL_NAME-2)} |{center_text('数量', COL_QTY-2)} |{center_text('销售单价', COL_PRICE-2)} |{center_text('销售金额', COL_AMT-2)} |{center_text('备注', COL_REMARK-2)} |"
+    # 表头（居中对齐）
+    header = page_start + f"|{center_text('序号', COL_NO)}|{center_text('品名', COL_NAME)}|{center_text('数量', COL_QTY)}|{center_text('单价', COL_PRICE)}|{center_text('金额', COL_AMT)}|{center_text('备注', COL_REMARK)}|"
     lines.append(header)
     
     # 表头分隔线
-    lines.append(page_start + "━" * (table_width - 2))
+    lines.append(page_start + "-" * (table_width - 2))
     
     # 商品明细
     total_qty = 0
     for idx, item in enumerate(products, 1):
         product = item.get("product", {})
-        name = product.get('name', '')[:22]
+        name = product.get('name', '')[:COL_NAME-1]
         qty = str(item.get('quantity', 0))
         price = f"{float(item.get('price', 0)):.2f}"
         amount = f"{float(item.get('totalAmount', 0)):.2f}"
-        remark = item.get('remark', '')[:6]
+        remark = item.get('remark', '')[:COL_REMARK-1]
         
-        # 数据行：序号右对齐，品名左对齐，其他右对齐
-        row = page_start + f"|{right_text(str(idx), COL_NO-2)} |{left_text(name, COL_NAME-2)} |{right_text(qty, COL_QTY-2)} |{right_text('¥' + price, COL_PRICE-2)} |{right_text('¥' + amount, COL_AMT-2)} |{left_text(remark, COL_REMARK-2)} |"
+        # 数据行：序号右对齐，品名左对齐，数值右对齐，备注左对齐
+        row = page_start + f"|{right_text(str(idx), COL_NO)}|{left_text(name, COL_NAME)}|{right_text(qty, COL_QTY)}|{right_text(price, COL_PRICE)}|{right_text(amount, COL_AMT)}|{left_text(remark, COL_REMARK)}|"
         lines.append(row)
         total_qty += item.get('quantity', 0)
     
     # 表尾分隔线
-    lines.append(page_start + "━" * (table_width - 2))
+    lines.append(page_start + "-" * (table_width - 2))
     
-    # ========== 汇总区域 - 右对齐 ==========
+    # ========== 汇总区域 ==========
     total_amount = float(order.get('totalAmount', 0))
     
-    summary1 = f"商品总数: {total_qty}  件"
-    summary2 = f"订单金额: ¥ {total_amount:.2f}"
-    summary3 = f"大写金额: {number_to_chinese(total_amount)}"
+    summary1 = f"总数: {total_qty}件"
+    summary2 = f"金额: ¥{total_amount:.2f}"
+    summary3 = f"大写: {number_to_chinese(total_amount)}"
     
-    # 汇总信息右对齐，与表格宽度一致
+    # 汇总信息右对齐
     lines.append("")
     lines.append(page_start + right_text(summary1, table_width - 2))
     lines.append(page_start + right_text(summary2, table_width - 2))
@@ -156,12 +181,11 @@ def create_print_content(job):
     
     # ========== 底部区域 ==========
     lines.append("")
-    lines.append(page_start + "━" * (table_width - 2))
+    lines.append(page_start + "-" * (table_width - 2))
     lines.append("")
-    lines.append(page_start + "客户签名: ______________________      日    期: ________________")
+    lines.append(page_start + "客户签名: ______________  日期: __________")
     lines.append("")
-    lines.append("")
-    lines.append(page_start + "备    注: 货物当面点清，出门概不退换")
+    lines.append(page_start + "备注: 货物当面点清，出门概不退换")
     lines.append("")
     lines.append(page_start + "服务电话: 138-0000-0000")
     lines.append("")
