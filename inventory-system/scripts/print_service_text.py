@@ -126,14 +126,14 @@ def create_print_content(job):
     lines.append(page_start + "-" * (table_width - 2))
     
     # ========== 表格区域 ==========
-    # 表头（居中对齐）
+    # 表头（右对齐，与表身数据保持一致）
     header_cells = [
-        center_text('序号', COL_NO),
-        center_text('品名', COL_NAME),
-        center_text('数量', COL_QTY),
-        center_text('单价', COL_PRICE),
-        center_text('金额', COL_AMT),
-        center_text('备注', COL_REMARK)
+        right_text('序号', COL_NO),
+        right_text('品名', COL_NAME),
+        right_text('数量', COL_QTY),
+        right_text('单价', COL_PRICE),
+        right_text('金额', COL_AMT),
+        right_text('备注', COL_REMARK)
     ]
     header = page_start + "|" + "|".join(header_cells) + "|"
     lines.append(header)
@@ -151,14 +151,14 @@ def create_print_content(job):
         amount = f"{float(item.get('totalAmount', 0)):.2f}"
         remark = item.get('remark', '')[:COL_REMARK]
         
-        # 数据行：所有字段居中对齐，与表头保持一致
+        # 数据行：所有字段右对齐，与表头保持一致
         row_cells = [
-            center_text(str(idx), COL_NO),
-            center_text(name, COL_NAME),
-            center_text(qty, COL_QTY),
-            center_text(price, COL_PRICE),
-            center_text(amount, COL_AMT),
-            center_text(remark, COL_REMARK)
+            right_text(str(idx), COL_NO),      # 序号右对齐
+            right_text(name, COL_NAME),         # 品名右对齐
+            right_text(qty, COL_QTY),           # 数量右对齐
+            right_text(price, COL_PRICE),       # 单价右对齐
+            right_text(amount, COL_AMT),        # 金额右对齐
+            right_text(remark, COL_REMARK)      # 备注右对齐
         ]
         row = page_start + "|" + "|".join(row_cells) + "|"
         lines.append(row)
