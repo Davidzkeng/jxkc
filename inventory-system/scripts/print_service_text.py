@@ -83,12 +83,15 @@ def create_print_content(job):
     left_margin = (PAGE_WIDTH - table_width) // 2
     page_start = ' ' * left_margin
     
+    # 固定行宽度 = 左侧边距 + 表格宽度
+    line_width = left_margin + table_width
+    
     lines = []
     
     # ========== 标题区域 ==========
     title = "【 销 售 单 】"
-    lines.append(' ' * ((PAGE_WIDTH - len(title)) // 2) + title)
-    lines.append(' ' * ((PAGE_WIDTH - len(title)) // 2) + "=" * len(title))
+    lines.append(center_text(title, PAGE_WIDTH))
+    lines.append(center_text("=" * len(title), PAGE_WIDTH))
     
     # ========== 客户信息区域 ==========
     order_date = order.get('createdAt', '')
@@ -99,44 +102,36 @@ def create_print_content(job):
         except:
             pass
     
-    # 客户名称和日期 - 使用固定宽度确保对齐
-    left_info1 = f"客户: {customer.get('name', '')}"
-    right_label1 = "日期:"
-    right_value1 = order_date
-    # 右侧固定宽度显示区域
-    right_width = 20  # 固定右侧宽度
-    right_info1 = f"{right_label1} {right_value1}"
-    # 计算中间空格数
-    middle_space = table_width - len(left_info1) - right_width - 2
-    info_line1 = page_start + left_info1 + ' ' * max(middle_space, 1) + right_text(right_info1, right_width)
-    lines.append(info_line1)
+    # 客户名称和日期 - 固定宽度
+    left_part1 = left_text(f"客户: {customer.get('name', '')}", 30)
+    right_part1 = right_text(f"日期: {order_date}", 26)
+    info_line1 = page_start + left_part1 + right_part1
+    lines.append(info_line1[:line_width])  # 确保长度固定
     
-    # 电话和单号 - 确保日期和单号右对齐
-    left_info2 = f"电话: {customer.get('phone', '')}"
-    right_label2 = "单号:"
-    right_value2 = order.get('orderNumber', '')[:16]
-    # 使用相同的右侧固定宽度
-    right_info2 = f"{right_label2} {right_value2}"
-    middle_space = table_width - len(left_info2) - right_width - 2
-    info_line2 = page_start + left_info2 + ' ' * max(middle_space, 1) + right_text(right_info2, right_width)
-    lines.append(info_line2)
+    # 电话和单号 - 固定宽度
+    left_part2 = left_text(f"电话: {customer.get('phone', '')}", 30)
+    right_part2 = right_text(f"单号: {order.get('orderNumber', '')[:16]}", 26)
+    info_line2 = page_start + left_part2 + right_part2
+    lines.append(info_line2[:line_width])  # 确保长度固定
     
-    # 分隔线
-    lines.append("")
+    # 空行
+    lines.append(page_start)
+    
+    # 分隔线 - 固定长度
     lines.append(page_start + "-" * (table_width - 2))
     
     # ========== 表格区域 ==========
-    # 表头（右对齐，与表身数据保持一致）
+    # 表头（居中对齐）
     header_cells = [
-        right_text('序号', COL_NO),
-        right_text('品名', COL_NAME),
-        right_text('数量', COL_QTY),
-        right_text('单价', COL_PRICE),
-        right_text('金额', COL_AMT),
-        right_text('备注', COL_REMARK)
+        center_text('序号', COL_NO),
+        center_text('品名', COL_NAME),
+        center_text('数量', COL_QTY),
+        center_text('单价', COL_PRICE),
+        center_text('金额', COL_AMT),
+        center_text('备注', COL_REMARK)
     ]
     header = page_start + "|" + "|".join(header_cells) + "|"
-    lines.append(header)
+    lines.append(header[:line_width])  # 确保长度固定
     
     # 表头分隔线
     lines.append(page_start + "-" * (table_width - 2))
@@ -151,17 +146,17 @@ def create_print_content(job):
         amount = f"{float(item.get('totalAmount', 0)):.2f}"
         remark = item.get('remark', '')[:COL_REMARK]
         
-        # 数据行：所有字段右对齐，与表头保持一致
+        # 数据行：所有字段居中对齐，与表头保持一致
         row_cells = [
-            right_text(str(idx), COL_NO),      # 序号右对齐
-            right_text(name, COL_NAME),         # 品名右对齐
-            right_text(qty, COL_QTY),           # 数量右对齐
-            right_text(price, COL_PRICE),       # 单价右对齐
-            right_text(amount, COL_AMT),        # 金额右对齐
-            right_text(remark, COL_REMARK)      # 备注右对齐
+            center_text(str(idx), COL_NO),      # 序号居中
+            center_text(name, COL_NAME),         # 品名居中
+            center_text(qty, COL_QTY),           # 数量居中
+            center_text(price, COL_PRICE),       # 单价居中
+            center_text(amount, COL_AMT),        # 金额居中
+            center_text(remark, COL_REMARK)      # 备注居中
         ]
         row = page_start + "|" + "|".join(row_cells) + "|"
-        lines.append(row)
+        lines.append(row[:line_width])  # 确保长度固定
         total_qty += item.get('quantity', 0)
     
     # 表尾分隔线
@@ -170,26 +165,28 @@ def create_print_content(job):
     # ========== 汇总区域 ==========
     total_amount = float(order.get('totalAmount', 0))
     
-    summary1 = f"总数: {total_qty}件"
-    summary2 = f"金额: ¥{total_amount:.2f}"
-    summary3 = f"大写: {number_to_chinese(total_amount)}"
+    # 空行
+    lines.append(page_start)
     
-    # 汇总信息右对齐
-    lines.append("")
-    lines.append(page_start + right_text(summary1, table_width - 2))
-    lines.append(page_start + right_text(summary2, table_width - 2))
-    lines.append(page_start + right_text(summary3, table_width - 2))
+    # 汇总信息右对齐，固定宽度
+    summary1 = right_text(f"总数: {total_qty}件", table_width - 2)
+    summary2 = right_text(f"金额: ¥{total_amount:.2f}", table_width - 2)
+    summary3 = right_text(f"大写: {number_to_chinese(total_amount)}", table_width - 2)
+    
+    lines.append(page_start + summary1)
+    lines.append(page_start + summary2)
+    lines.append(page_start + summary3)
     
     # ========== 底部区域 ==========
-    lines.append("")
+    lines.append(page_start)
     lines.append(page_start + "-" * (table_width - 2))
-    lines.append("")
+    lines.append(page_start)
     lines.append(page_start + "客户签名: ______________  日期: __________")
-    lines.append("")
+    lines.append(page_start)
     lines.append(page_start + "备注: 货物当面点清，出门概不退换")
-    lines.append("")
+    lines.append(page_start)
     lines.append(page_start + "服务电话: 138-0000-0000")
-    lines.append("")
+    lines.append(page_start)
     
     # 走纸
     lines.append("\n\n\n")
@@ -326,6 +323,53 @@ def process_print_job(job):
         update_job_status(job_id, 'failed', error_message=str(e))
 
 
+def test_print_content():
+    """测试打印内容输出，不实际打印"""
+    # 模拟订单数据
+    test_job = {
+        "order": {
+            "orderNumber": "SO202401010001",
+            "createdAt": "2024-01-01T10:30:00Z",
+            "totalAmount": 1234.56,
+            "customer": {
+                "name": "测试客户",
+                "phone": "13800138000"
+            },
+            "products": [
+                {
+                    "product": {"name": "苹果"},
+                    "quantity": 10.5,
+                    "price": 5.50,
+                    "totalAmount": 57.75,
+                    "remark": "新鲜"
+                },
+                {
+                    "product": {"name": "香蕉"},
+                    "quantity": 20,
+                    "price": 3.00,
+                    "totalAmount": 60.00,
+                    "remark": ""
+                },
+                {
+                    "product": {"name": "橙子"},
+                    "quantity": 15.5,
+                    "price": 4.50,
+                    "totalAmount": 69.75,
+                    "remark": "甜"
+                }
+            ]
+        }
+    }
+    
+    content = create_print_content(test_job)
+    print("=" * 70)
+    print("打印内容预览（每行长度标记）:")
+    print("=" * 70)
+    for i, line in enumerate(content.split('\n')):
+        print(f"{len(line):2d}| {line}")
+    print("=" * 70)
+
+
 def main():
     """主循环"""
     print("=" * 50)
@@ -355,4 +399,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # 如果有参数 --test，则运行测试
+    if len(sys.argv) > 1 and sys.argv[1] == '--test':
+        test_print_content()
+    else:
+        main()
