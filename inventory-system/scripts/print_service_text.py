@@ -64,22 +64,24 @@ def create_print_content(job):
     
     # 固定列宽设计 (总宽度80字符)
     COL_NO = 6      # 序号
-    COL_NAME = 24   # 品名
+    COL_NAME = 20   # 品名
     COL_QTY = 8     # 数量
-    COL_PRICE = 12  # 单价
-    COL_AMT = 14    # 金额
+    COL_PRICE = 10  # 单价
+    COL_AMT = 12    # 金额
+    COL_REMARK = 8  # 备注
     
     # 表格总宽度
-    table_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + 10  # +10 是分隔符 |
+    table_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK + 12  # +12 是分隔符 |
     
     # 计算整体居中偏移
-    #page_start = ' ' * ((PAGE_WIDTH - table_width) // 2)
     page_start = ' '
     lines = []
     
-    # ========== 标题区域 ==========
-    title = "销 售 单"
+    # ========== 标题区域 - 使用大号字体效果 ==========
+    # 使用特殊字符模拟大号字体（加粗效果）
+    title = "【 销 售 单 】"
     lines.append(' ' * ((PAGE_WIDTH - len(title)) // 2) + title)
+    lines.append(' ' * ((PAGE_WIDTH - len(title)) // 2) + "=" * len(title))
     
     # ========== 客户信息区域 - 两行布局 ==========
     order_date = order.get('createdAt', '')
@@ -96,7 +98,7 @@ def create_print_content(job):
     line1 = page_start + left_info1 + ' ' * (table_width - len(left_info1) - len(right_info1)) + right_info1
     lines.append(line1)
     
-    # 第二行: 电话 (右) + 订单编号 (右)
+    # 第二行: 电话 (左) + 订单编号 (右)
     left_info2 = f"电话: {customer.get('phone', '')}"
     right_info2 = f"订单编号: {order.get('orderNumber', '')[:20]}"
     line2 = page_start + left_info2 + ' ' * (table_width - len(left_info2) - len(right_info2)) + right_info2
@@ -104,47 +106,52 @@ def create_print_content(job):
     
     # 分隔线
     lines.append("")
-    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
     # ========== 表格区域 ==========
-    # 表头使用与表身相同的对齐方式：序号右对齐，品名左对齐，数量和金额右对齐
-    header = page_start + f"|{right_text('序号', COL_NO-2)} |{left_text('商品名称', COL_NAME-2)} |{right_text('数量', COL_QTY-2)} |{right_text('销售单价', COL_PRICE-2)} |{right_text('销售金额', COL_AMT-2)} |"
+    # 表头使用与表身相同的对齐方式
+    header = page_start + f"|{right_text('序号', COL_NO-2)} |{left_text('商品名称', COL_NAME-2)} |{right_text('数量', COL_QTY-2)} |{right_text('销售单价', COL_PRICE-2)} |{right_text('销售金额', COL_AMT-2)} |{left_text('备注', COL_REMARK-2)} |"
     lines.append(header)
     
     # 表头分隔线
-    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
     # 商品明细
     total_qty = 0
     for idx, item in enumerate(products, 1):
         product = item.get("product", {})
-        name = product.get('name', '')[:22]
+        name = product.get('name', '')[:18]
         qty = str(item.get('quantity', 0))
         price = f"{float(item.get('price', 0)):.2f}"
         amount = f"{float(item.get('totalAmount', 0)):.2f}"
+        remark = item.get('remark', '')[:6]
         
-        row = page_start + f"|{right_text(str(idx), COL_NO-2)} |{left_text(name, COL_NAME-2)} |{right_text(qty, COL_QTY-2)} |{right_text('¥' + price, COL_PRICE-2)} |{right_text('¥' + amount, COL_AMT-2)} |"
+        row = page_start + f"|{right_text(str(idx), COL_NO-2)} |{left_text(name, COL_NAME-2)} |{right_text(qty, COL_QTY-2)} |{right_text('¥' + price, COL_PRICE-2)} |{right_text('¥' + amount, COL_AMT-2)} |{left_text(remark, COL_REMARK-2)} |"
         lines.append(row)
         total_qty += item.get('quantity', 0)
     
     # 表尾分隔线
-    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     
-    # ========== 汇总区域 ==========
+    # ========== 汇总区域 - 右对齐 ==========
     total_amount = float(order.get('totalAmount', 0))
+    
+    # 计算汇总区域的最大宽度，用于右对齐
+    summary_max_width = 50  # 汇总信息的最大宽度
     
     summary1 = f"商品总数: {total_qty}  件"
     summary2 = f"订单金额: ¥ {total_amount:.2f}"
     summary3 = f"大写金额: {number_to_chinese(total_amount)}"
     
+    # 使用右对齐，基于表格宽度
     lines.append("")
-    lines.append(' ' * ((PAGE_WIDTH - len(summary1)) // 2) + summary1)
-    lines.append(' ' * ((PAGE_WIDTH - len(summary2)) // 2) + summary2)
-    lines.append(' ' * ((PAGE_WIDTH - len(summary3)) // 2) + summary3)
+    lines.append(page_start + right_text(summary1, table_width))
+    lines.append(page_start + right_text(summary2, table_width))
+    lines.append(page_start + right_text(summary3, table_width))
     
     # ========== 底部区域 ==========
     lines.append("")
-    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    lines.append(page_start + "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
     lines.append("")
     lines.append(page_start + "客户签名: ______________________      日    期: ________________")
     lines.append("")
