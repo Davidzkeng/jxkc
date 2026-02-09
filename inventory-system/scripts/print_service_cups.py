@@ -31,9 +31,17 @@ def cups_print(printer_name, content):
         (success, job_id, error_msg)
     """
     try:
-        # 创建临时文件写入打印内容
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False, encoding='utf-8') as f:
-            f.write(content)
+        # 将UTF-8内容转换为GBK编码（EPSON针式打印机需要GBK编码）
+        content_gbk = content.encode('gbk', errors='ignore')
+        
+        # 添加Form Feed (FF)命令，告诉打印机打印完成可以出纸
+        # FF = 0x0C
+        ff_command = b'\x0C'
+        
+        # 创建临时文件写入GBK编码内容
+        with tempfile.NamedTemporaryFile(mode='wb', suffix='.txt', delete=False) as f:
+            f.write(content_gbk)
+            f.write(ff_command)  # 添加换页命令
             temp_file = f.name
         
         # 使用lp命令打印
@@ -98,25 +106,34 @@ def get_cups_printers():
 
 
 def format_print_content(job):
-    """格式化打印内容"""
+    """格式化打印内容 - 22cm x 14cm 纸张，居中打印"""
     order = job.get("order", {})
     products = order.get("products", [])
     customer = order.get("customer", {})
     
+    # 表格宽度定义
+    col_no = 4      # 序号
+    col_name = 14   # 品名
+    col_qty = 6     # 数量
+    col_price = 10  # 单价
+    col_amount = 10 # 金额
+    total_width = col_no + col_name + col_qty + col_price + col_amount + 6  # +6 是分隔符
+    
+    # 边框线
+    border = "+" + "-" * (total_width - 2) + "+"
+    separator = "+" + "-" * (col_no + 2) + "+" + "-" * (col_name + 2) + "+" + "-" * (col_qty + 2) + "+" + "-" * (col_price + 2) + "+" + "-" * (col_amount + 2) + "+"
+    
     lines = []
     
     # 标题
-    lines.append("=" * 48)
-    lines.append(" " * 14 + "销售单")
-    lines.append("=" * 48)
     lines.append("")
+    lines.append("=" * total_width)
+    lines.append(" " * ((total_width - 6) // 2) + "销售单")
+    lines.append("=" * total_width)
     
-    # 表头信息
-    lines.append(f"客户名称: {customer.get('name', '')}")
-    lines.append(f"电话:     {customer.get('phone', '')}")
-    lines.append(f"单号:    {order.get('orderNumber', '')}")
-    
-    # 格式化日期
+    # 客户信息
+    customer_name = customer.get('name', '')
+    customer_phone = customer.get('phone', '')
     order_date = order.get('createdAt', '')
     if order_date:
         try:
@@ -124,46 +141,51 @@ def format_print_content(job):
             order_date = dt.strftime('%Y-%m-%d')
         except:
             pass
-    lines.append(f"日期:    {order_date}")
-    lines.append("")
+    order_number = order.get('orderNumber', '')[:20]
     
-    # 分隔线
-    lines.append("-" * 48)
+    lines.append(border)
+    lines.append(f"| 客户: {customer_name:<24} | 日期: {order_date} |")
+    lines.append(f"| 电话: {customer_phone:<24} | 单号: {order_number:<14} |")
+    lines.append(separator)
     
     # 表头
-    lines.append(f"{'货号':<8} {'品名':<10} {'数量':>4} {'单价':>8} {'金额':>10}")
-    lines.append("-" * 48)
+    header = f"| {'序号':^{col_no}} | {'品名':^{col_name}} | {'数量':^{col_qty}} | {'单价':^{col_price}} | {'金额':^{col_amount}} |"
+    lines.append(header)
+    lines.append(separator)
     
     # 商品明细
     total_qty = 0
-    for item in products:
+    for idx, item in enumerate(products, 1):
         product = item.get("product", {})
-        code = product.get('code', '')[:6]
-        name = product.get('name', '')[:8]
+        name = (product.get('name', '') + ' ' * col_name)[:col_name]
         qty = item.get('quantity', 0)
         price = float(item.get('price', 0))
         amount = float(item.get('totalAmount', 0))
         
-        lines.append(f"{code:<8} {name:<10} {qty:>4} {price:>8.2f} {amount:>10.2f}")
+        row = f"| {str(idx):^{col_no}} | {name:<{col_name}} | {str(qty):^{col_qty}} | {price:^{col_price}.2f} | {amount:^{col_amount}.2f} |"
+        lines.append(row)
         total_qty += qty
     
     # 空行填充
-    for _ in range(max(6 - len(products), 0)):
-        lines.append("")
+    empty_row = f"| {' ':^{col_no}} | {' ':^{col_name}} | {' ':^{col_qty}} | {' ':^{col_price}} | {' ':^{col_amount}} |"
+    for _ in range(max(4 - len(products), 0)):
+        lines.append(empty_row)
     
-    lines.append("-" * 48)
+    lines.append(separator)
     
     # 汇总信息
     total_amount = float(order.get('totalAmount', 0))
-    lines.append(f"总数量:  {total_qty}")
-    lines.append(f"总金额:  ¥{total_amount:.2f}")
-    lines.append(f"金额(大写): {number_to_chinese(total_amount)}")
-    lines.append("")
-    lines.append("-" * 48)
-    lines.append("注: 货物当面点清，过后概不负责。")
-    lines.append("=" * 48)
-    lines.append("")
-    lines.append("")
+    lines.append(f"| 总数量: {total_qty:<34} |")
+    lines.append(f"| 总金额: ¥{total_amount:<34.2f} |")
+    lines.append(f"| 大写: {number_to_chinese(total_amount):<36} |")
+    lines.append(border)
+    
+    # 底部信息
+    lines.append("| 服务电话:                             客户签名:      |")
+    lines.append("|                                          __________   |")
+    lines.append("=" * total_width)
+    lines.append("| 备注: 货物当面点清，过后概不负责。                   |")
+    lines.append("=" * total_width)
     lines.append("")
     
     return "\n".join(lines)
