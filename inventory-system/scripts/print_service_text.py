@@ -34,11 +34,14 @@ def cut_text(text, width):
 def center_text(text, width):
     """居中显示文本，确保返回指定宽度的字符串"""
     text = str(text)
-    if len(text) >= width:
+    text_len = len(text)
+    if text_len >= width:
         return text[:width]
-    left = (width - len(text)) // 2
-    right = width - left - len(text)
-    return ' ' * left + text + ' ' * right
+    left = (width - text_len) // 2
+    right = width - left - text_len
+    result = ' ' * left + text + ' ' * right
+    # 确保返回的长度正确
+    return result[:width]
 
 
 def left_text(text, width):
@@ -96,16 +99,26 @@ def create_print_content(job):
         except:
             pass
     
-    # 客户名称和日期
+    # 客户名称和日期 - 使用固定宽度确保对齐
     left_info1 = f"客户: {customer.get('name', '')}"
-    right_info1 = f"日期: {order_date}"
-    info_line1 = page_start + left_info1 + ' ' * (table_width - len(left_info1) - len(right_info1) - 2) + right_info1
+    right_label1 = "日期:"
+    right_value1 = order_date
+    # 右侧固定宽度显示区域
+    right_width = 20  # 固定右侧宽度
+    right_info1 = f"{right_label1} {right_value1}"
+    # 计算中间空格数
+    middle_space = table_width - len(left_info1) - right_width - 2
+    info_line1 = page_start + left_info1 + ' ' * max(middle_space, 1) + right_text(right_info1, right_width)
     lines.append(info_line1)
     
-    # 电话和单号
+    # 电话和单号 - 确保日期和单号右对齐
     left_info2 = f"电话: {customer.get('phone', '')}"
-    right_info2 = f"单号: {order.get('orderNumber', '')[:16]}"
-    info_line2 = page_start + left_info2 + ' ' * (table_width - len(left_info2) - len(right_info2) - 2) + right_info2
+    right_label2 = "单号:"
+    right_value2 = order.get('orderNumber', '')[:16]
+    # 使用相同的右侧固定宽度
+    right_info2 = f"{right_label2} {right_value2}"
+    middle_space = table_width - len(left_info2) - right_width - 2
+    info_line2 = page_start + left_info2 + ' ' * max(middle_space, 1) + right_text(right_info2, right_width)
     lines.append(info_line2)
     
     # 分隔线
@@ -114,7 +127,15 @@ def create_print_content(job):
     
     # ========== 表格区域 ==========
     # 表头（居中对齐）
-    header = page_start + f"|{center_text('序号', COL_NO)}|{center_text('品名', COL_NAME)}|{center_text('数量', COL_QTY)}|{center_text('单价', COL_PRICE)}|{center_text('金额', COL_AMT)}|{center_text('备注', COL_REMARK)}|"
+    header_cells = [
+        center_text('序号', COL_NO),
+        center_text('品名', COL_NAME),
+        center_text('数量', COL_QTY),
+        center_text('单价', COL_PRICE),
+        center_text('金额', COL_AMT),
+        center_text('备注', COL_REMARK)
+    ]
+    header = page_start + "|" + "|".join(header_cells) + "|"
     lines.append(header)
     
     # 表头分隔线
@@ -131,7 +152,15 @@ def create_print_content(job):
         remark = item.get('remark', '')[:COL_REMARK]
         
         # 数据行：所有字段居中对齐，与表头保持一致
-        row = page_start + f"|{center_text(str(idx), COL_NO)}|{center_text(name, COL_NAME)}|{center_text(qty, COL_QTY)}|{center_text(price, COL_PRICE)}|{center_text(amount, COL_AMT)}|{center_text(remark, COL_REMARK)}|"
+        row_cells = [
+            center_text(str(idx), COL_NO),
+            center_text(name, COL_NAME),
+            center_text(qty, COL_QTY),
+            center_text(price, COL_PRICE),
+            center_text(amount, COL_AMT),
+            center_text(remark, COL_REMARK)
+        ]
+        row = page_start + "|" + "|".join(row_cells) + "|"
         lines.append(row)
         total_qty += item.get('quantity', 0)
     
