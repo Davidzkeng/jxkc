@@ -54,65 +54,15 @@
 
     <!-- 客户搜索选择 -->
     <view class="form-item">
-      <text class="form-label">选择客户 *</text>
-      <view class="search-picker-container">
-        <view class="search-input-wrapper">
-          <input 
-            class="search-input" 
-            placeholder="搜索客户..." 
-            value="{{customerSearchKey}}" 
-            bindinput="onCustomerSearchInput" 
-          />
-        </view>
-        <view 
-          class="selected-item" 
-          wx:if="{{selectedCustomer}}"
-        >
-          <text class="selected-text">{{selectedCustomer.name}}</text>
-          <text class="clear-btn" bindtap="clearSelectedCustomer">×</text>
-        </view>
-        <view 
-          class="selected-item placeholder" 
-          wx:else
-          bindtap="toggleCustomerList"
-        >
-          <text>请选择客户</text>
-        </view>
-        
-        <!-- 客户列表 -->
-        <view class="search-results" wx:if="{{showCustomerList}}">
-          <scroll-view scroll-y="true" style="max-height: 400rpx;">
-            <view 
-              class="result-item" 
-              wx:for="{{filteredCustomers}}" 
-              wx:key="id"
-              bindtap="selectCustomer"
-              data-customer="{{item}}"
-            >
-              <text class="result-name">{{item.name}}</text>
-              <text class="result-contact">{{item.contact}} - {{item.phone}}</text>
-            </view>
-            <view class="result-item empty" wx:if="{{filteredCustomers.length === 0}}">
-              <text>暂无客户</text>
-            </view>
-          </scroll-view>
-        </view>
+      <text class="form-label">选择客户</text>
+      <view class="form-input" style="background-color: #f5f5f5; color: #666;">
+        散客（无需选择）
       </view>
     </view>
 
     <view class="form-item">
       <text class="form-label">出库数量(斤) *</text>
       <input class="form-input" type="digit" value="{{quantity}}" bindinput="onQuantityChange" placeholder="请输入出库数量(斤)" />
-    </view>
-
-    <view class="form-item">
-      <text class="form-label">单价 *</text>
-      <input class="form-input" type="digit" value="{{price}}" bindinput="onPriceChange" placeholder="请输入单价" />
-    </view>
-
-    <view wx:if="{{totalAmount}}" class="form-item total-item">
-      <text class="form-label">出库总额</text>
-      <text class="total-amount">¥{{totalAmount}}</text>
     </view>
 
     <view class="form-actions">

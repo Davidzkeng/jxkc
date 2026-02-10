@@ -1,4 +1,4 @@
-import prisma from '../server/prisma.js';
+const prisma = require('../server/prisma');
 
 // 获取所有商品
 exports.getAllProducts = async (req, res) => {
@@ -6,7 +6,8 @@ exports.getAllProducts = async (req, res) => {
     const products = await prisma.product.findMany({
       include: { 
         category: true,
-        supplier: true
+        supplier: true,
+        productUnits: true
       }
     });
     res.json(products);
@@ -23,7 +24,8 @@ exports.getProductById = async (req, res) => {
       where: { id: parseInt(id) },
       include: { 
         category: true,
-        supplier: true
+        supplier: true,
+        productUnits: true
       }
     });
     if (!product) {
@@ -39,6 +41,8 @@ exports.getProductById = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const { name, code, categoryId, supplierId, price, stock, description } = req.body;
+    
+    // 创建商品
     const product = await prisma.product.create({
       data: { 
         name, 
@@ -50,7 +54,29 @@ exports.createProduct = async (req, res) => {
         description 
       }
     });
-    res.json(product);
+    
+    // 自动添加默认单位"斤"
+    await prisma.productUnit.create({
+      data: {
+        productId: product.id,
+        unitName: '斤',
+        conversionRate: 1,
+        price: parseFloat(price) || 0,
+        isDefault: true
+      }
+    });
+    
+    // 返回包含单位的商品信息
+    const productWithUnits = await prisma.product.findUnique({
+      where: { id: product.id },
+      include: {
+        category: true,
+        supplier: true,
+        productUnits: true
+      }
+    });
+    
+    res.json(productWithUnits);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -83,7 +109,30 @@ exports.updateProduct = async (req, res) => {
 exports.deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    await prisma.product.delete({ where: { id: parseInt(id) } });
+    const productId = parseInt(id);
+
+    // 先删除该商品的所有入库记录
+    await prisma.inRecord.deleteMany({
+      where: { productId }
+    });
+
+    // 先删除该商品的所有出库记录
+    await prisma.outRecord.deleteMany({
+      where: { productId }
+    });
+
+    // 删除库存盘点记录
+    await prisma.inventoryCheck.deleteMany({
+      where: { productId }
+    });
+
+    // 删除销售单商品关联记录
+    await prisma.salesOrderProduct.deleteMany({
+      where: { productId }
+    });
+
+    // 再删除商品
+    await prisma.product.delete({ where: { id: productId } });
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -16,8 +16,6 @@ Page({
     
     // 表单数据
     quantity: '',
-    price: '',
-    totalAmount: '',
     loading: false,
     submitLoading: false
   },
@@ -107,19 +105,8 @@ Page({
 
   onQuantityChange(e) {
     const quantity = e.detail.value;
-    const price = parseFloat(this.data.price);
     this.setData({
-      quantity: quantity,
-      totalAmount: price && quantity ? (price * parseFloat(quantity)).toFixed(2) : ''
-    });
-  },
-
-  onPriceChange(e) {
-    const price = e.detail.value;
-    const quantity = parseFloat(this.data.quantity);
-    this.setData({
-      price: price,
-      totalAmount: price && quantity ? (parseFloat(price) * quantity).toFixed(2) : ''
+      quantity: quantity
     });
   },
 
@@ -142,22 +129,13 @@ Page({
       return;
     }
 
-    if (!this.data.price) {
-      util.showError('请输入单价');
-      return;
-    }
-
     const quantity = parseFloat(this.data.quantity);
-    const price = parseFloat(this.data.price);
-    const totalAmount = quantity * price;
     const supplierId = this.data.selectedProduct.supplierId || this.data.selectedProduct.supplier.id;
 
     const data = {
       productId: this.data.selectedProduct.id,
       supplierId: supplierId,
-      quantity: quantity,
-      price: price,
-      totalAmount: totalAmount
+      quantity: quantity
     };
 
     console.log('发送的数据:', data);

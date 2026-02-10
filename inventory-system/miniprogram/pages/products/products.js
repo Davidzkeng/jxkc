@@ -45,6 +45,14 @@ Page({
     });
   },
 
+  navigateToUnits(e) {
+    const id = e.currentTarget.dataset.id;
+    const product = this.data.products.find(p => p.id === id);
+    wx.navigateTo({
+      url: `/pages/products/units?productId=${id}&productName=${product.name}`
+    });
+  },
+
   deleteProduct(e) {
     const id = e.currentTarget.dataset.id;
     util.showConfirm('确定要删除该商品吗？', () => {

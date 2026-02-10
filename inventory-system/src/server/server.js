@@ -8,6 +8,7 @@ const path = require('path');
 // 导入路由
 const categoryRoutes = require('../routes/categoryRoutes');
 const productRoutes = require('../routes/productRoutes');
+const productUnitRoutes = require('../routes/productUnitRoutes');
 const customerRoutes = require('../routes/customerRoutes');
 const supplierRoutes = require('../routes/supplierRoutes');
 const inRecordRoutes = require('../routes/inRecordRoutes');
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, '../../dist')));
 // API路由
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api', productUnitRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/in-records', inRecordRoutes);

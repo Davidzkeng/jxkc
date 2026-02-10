@@ -1,0 +1,20 @@
+[Unit]
+Description=Inventory Print Service (Image)
+After=network.target cups.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/print-service
+Environment="PRINT_API_URL=http://159.75.245.32:3001/api"
+Environment="PRINT_POLL_INTERVAL=5"
+Environment="CUPS_PRINTER=EPSON_LQ-630K"
+ExecStart=/usr/bin/python3 /opt/print-service/print_service_image.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=print-service-image
+
+[Install]
+WantedBy=multi-user.target

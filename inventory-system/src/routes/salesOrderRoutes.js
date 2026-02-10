@@ -11,8 +11,8 @@ router.get('/:id', salesOrderController.getSalesOrderById);
 // 创建销售单
 router.post('/', salesOrderController.createSalesOrder);
 
-// 更新销售单
-router.put('/:id', salesOrderController.updateSalesOrder);
+// 作废销售单
+router.post('/:id/void', salesOrderController.voidSalesOrder);
 
 // 删除销售单
 router.delete('/:id', salesOrderController.deleteSalesOrder);

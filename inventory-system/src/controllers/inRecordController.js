@@ -38,19 +38,16 @@ exports.getInRecordById = async (req, res) => {
 // 创建入库记录
 exports.createInRecord = async (req, res) => {
   try {
-    const { productId, supplierId, quantity, price, date } = req.body;
+    const { productId, supplierId, quantity, date } = req.body;
     
-    // 计算总金额
-    const totalAmount = parseFloat((quantity * parseFloat(price)).toFixed(2));
-    
-    // 创建入库记录
+    // 创建入库记录（不记录价格）
     const inRecord = await prisma.inRecord.create({
       data: {
         productId,
         supplierId,
         quantity,
-        price,
-        totalAmount,
+        price: 0,
+        totalAmount: 0,
         date: date ? new Date(date) : new Date()
       }
     });
@@ -75,7 +72,7 @@ exports.createInRecord = async (req, res) => {
 exports.updateInRecord = async (req, res) => {
   try {
     const { id } = req.params;
-    const { productId, supplierId, quantity, price, date } = req.body;
+    const { productId, supplierId, quantity, date } = req.body;
     
     // 获取原入库记录
     const originalRecord = await prisma.inRecord.findUnique({
@@ -86,18 +83,13 @@ exports.updateInRecord = async (req, res) => {
       return res.status(404).json({ error: '入库记录不存在' });
     }
     
-    // 计算总金额
-    const totalAmount = parseFloat((quantity * parseFloat(price)).toFixed(2));
-    
-    // 更新入库记录
+    // 更新入库记录（不更新价格）
     const inRecord = await prisma.inRecord.update({
       where: { id: parseInt(id) },
       data: {
         productId,
         supplierId,
         quantity,
-        price,
-        totalAmount,
         date: new Date(date)
       }
     });

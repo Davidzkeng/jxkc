@@ -103,18 +103,37 @@
             <text class="product-name">{{item.name}}</text>
             <text class="product-code">编码: {{item.code}}</text>
           </view>
-          <view class="product-actions">
+          <view class="product-row">
+            <!-- 单位选择 -->
+            <view class="unit-picker" wx:if="{{item.units.length > 1}}">
+              <picker 
+                mode="selector" 
+                range="{{item.units}}" 
+                range-key="unitName"
+                value="{{item.unitsIndex || 0}}"
+                bindchange="onUnitChange"
+                data-index="{{index}}"
+              >
+                <view class="picker">
+                  {{item.selectedUnit.unitName}} ▾
+                </view>
+              </picker>
+            </view>
+            <text wx:else class="unit-text">{{item.selectedUnit.unitName}}</text>
+            <!-- 单价 -->
             <view class="price-container red-amount">
               <text class="price-symbol">¥</text>
               <input 
                 class="price-input" 
                 type="number" 
                 placeholder="0.00" 
-                value="{{item.price}}" 
+                value="{{item.selectedUnit.price}}" 
                 bindinput="onPriceChange" 
                 data-index="{{index}}"
               />
             </view>
+          </view>
+          <view class="product-actions">
             <view class="quantity-container">
               <text class="quantity-btn minus" bindtap="decreaseQuantity" data-index="{{index}}">-</text>
               <input 
@@ -128,6 +147,9 @@
               <text class="quantity-btn plus" bindtap="increaseQuantity" data-index="{{index}}">+</text>
             </view>
             <text class="remove-btn" bindtap="removeProduct" data-index="{{index}}">删除</text>
+          </view>
+          <view class="product-subtotal">
+            <text>小计: ¥{{item.subtotal}}</text>
           </view>
         </view>
       </view>

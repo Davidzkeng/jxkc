@@ -61,132 +61,74 @@ def right_text(text, width):
 
 
 def create_print_content(job):
-    """创建纯文本打印内容 - 固定宽度表格"""
+    """创建纯文本打印内容 - 90字符宽度，适合针式打印机"""
     order = job.get("order", {})
     products = order.get("products", [])
     customer = order.get("customer", {})
     
-    # 240mm纸张，每字符4mm，总宽度60字符
-    # 表格总宽度 = 7个| + 6列内容 + 12个空格 = 58字符
-    COL_NO = 3      # 序号
-    COL_NAME = 12   # 品名
-    COL_QTY = 5     # 数量
-    COL_PRICE = 8   # 单价
-    COL_AMT = 8     # 金额
-    COL_REMARK = 3  # 备注
-    
-    # 计算表格总宽度
-    content_width = COL_NO + COL_NAME + COL_QTY + COL_PRICE + COL_AMT + COL_REMARK
-    table_width = 7 + content_width + 12  # 7个| + 内容 + 12个空格 = 58
-    
-    # 左侧边距 = (60 - 58) // 2 = 1
-    left_margin = (PAGE_WIDTH - table_width) // 2
-    page_start = ' ' * left_margin
-    
-    # 固定行宽度 = 左侧边距 + 表格宽度
-    line_width = left_margin + table_width
+    # 90字符宽度模板
+    PAGE_WIDTH = 90
     
     lines = []
     
     # ========== 标题区域 ==========
-    title = "【 销 售 单 】"
-    lines.append(center_text(title, PAGE_WIDTH))
-    lines.append(center_text("=" * len(title), PAGE_WIDTH))
+    lines.append("=" * PAGE_WIDTH)
+    lines.append("                                  销 售 单 据")
+    lines.append("=" * PAGE_WIDTH)
     
-    # ========== 客户信息区域 ==========
-    order_date = order.get('createdAt', '')
-    if order_date:
+    # ========== 订单信息 ==========
+    order_date = ''
+    order_time = ''
+    if order.get('createdAt', ''):
         try:
-            dt = datetime.fromisoformat(order_date.replace('Z', '+00:00'))
+            dt = datetime.fromisoformat(order.get('createdAt', '').replace('Z', '+00:00'))
             order_date = dt.strftime('%Y-%m-%d')
+            order_time = dt.strftime('%H:%M:%S')
         except:
             pass
     
-    # 客户名称和日期 - 固定宽度
-    left_part1 = left_text(f"客户: {customer.get('name', '')}", 30)
-    right_part1 = right_text(f"日期: {order_date}", 26)
-    info_line1 = page_start + left_part1 + right_part1
-    lines.append(info_line1[:line_width])  # 确保长度固定
+    order_number = order.get('orderNumber', '')
+    lines.append(f"单号: {order_number:<30}日  期: {order_date:<15}时  间: {order_time}")
+    lines.append("-" * PAGE_WIDTH)
+    lines.append(f"客户名称: {customer.get('name', '')}")
+    lines.append(f"联系电话: {customer.get('phone', '')}")
+    lines.append(f"客户地址: {customer.get('address', '')}")
+    lines.append("-" * PAGE_WIDTH)
+    lines.append(" 序号   商品名称            规  格         单  位         数  量      单  价(元)    金  额(元)")
+    lines.append("-" * PAGE_WIDTH)
     
-    # 电话和单号 - 固定宽度
-    left_part2 = left_text(f"电话: {customer.get('phone', '')}", 30)
-    right_part2 = right_text(f"单号: {order.get('orderNumber', '')[:16]}", 26)
-    info_line2 = page_start + left_part2 + right_part2
-    lines.append(info_line2[:line_width])  # 确保长度固定
-    
-    # 空行
-    lines.append(page_start)
-    
-    # 分隔线 - 固定长度
-    lines.append(page_start + "-" * (table_width - 2))
-    
-    # ========== 表格区域 ==========
-    # 表头（居中对齐）
-    header_cells = [
-        center_text('序号', COL_NO),
-        center_text('品名', COL_NAME),
-        center_text('数量', COL_QTY),
-        center_text('单价', COL_PRICE),
-        center_text('金额', COL_AMT),
-        center_text('备注', COL_REMARK)
-    ]
-    header = page_start + "|" + "|".join(header_cells) + "|"
-    lines.append(header[:line_width])  # 确保长度固定
-    
-    # 表头分隔线
-    lines.append(page_start + "-" * (table_width - 2))
-    
-    # 商品明细 - 表身数据与表头严格对齐
+    # ========== 商品明细 ==========
     total_qty = 0
+    total_amount = 0.0
+    
     for idx, item in enumerate(products, 1):
         product = item.get("product", {})
-        name = product.get('name', '')[:COL_NAME]
-        qty = str(item.get('quantity', 0))
-        price = f"{float(item.get('price', 0)):.2f}"
-        amount = f"{float(item.get('totalAmount', 0)):.2f}"
-        remark = item.get('remark', '')[:COL_REMARK]
+        name = product.get('name', '')[:16]
+        spec = product.get('spec', '')[:8]
+        unit = item.get('unit', '个')[:4]
+        qty = item.get('quantity', 0)
+        price = float(item.get('price', 0))
+        amount = float(item.get('totalAmount', 0))
         
-        # 数据行：所有字段居中对齐，与表头保持一致
-        row_cells = [
-            center_text(str(idx), COL_NO),      # 序号居中
-            center_text(name, COL_NAME),         # 品名居中
-            center_text(qty, COL_QTY),           # 数量居中
-            center_text(price, COL_PRICE),       # 单价居中
-            center_text(amount, COL_AMT),        # 金额居中
-            center_text(remark, COL_REMARK)      # 备注居中
-        ]
-        row = page_start + "|" + "|".join(row_cells) + "|"
-        lines.append(row[:line_width])  # 确保长度固定
-        total_qty += item.get('quantity', 0)
+        line = f"{idx:<6}{name:<16}{spec:<10}{unit:<8}{qty:<10}{price:<12.2f}{amount:<12.2f}"
+        lines.append(line)
+        
+        total_qty += qty
+        total_amount += amount
     
-    # 表尾分隔线
-    lines.append(page_start + "-" * (table_width - 2))
-    
-    # ========== 汇总区域 ==========
-    total_amount = float(order.get('totalAmount', 0))
-    
-    # 空行
-    lines.append(page_start)
-    
-    # 汇总信息右对齐，固定宽度
-    summary1 = right_text(f"总数: {total_qty}件", table_width - 2)
-    summary2 = right_text(f"金额: ¥{total_amount:.2f}", table_width - 2)
-    summary3 = right_text(f"大写: {number_to_chinese(total_amount)}", table_width - 2)
-    
-    lines.append(page_start + summary1)
-    lines.append(page_start + summary2)
-    lines.append(page_start + summary3)
-    
-    # ========== 底部区域 ==========
-    lines.append(page_start)
-    lines.append(page_start + "-" * (table_width - 2))
-    lines.append(page_start)
-    lines.append(page_start + "客户签名: ______________  日期: __________")
-    lines.append(page_start)
-    lines.append(page_start + "备注: 货物当面点清，出门概不退换")
-    lines.append(page_start)
-    lines.append(page_start + "服务电话: 138-0000-0000")
-    lines.append(page_start)
+    lines.append("-" * PAGE_WIDTH)
+    lines.append(f"                                              合  计:               {total_qty:<8}{total_amount:<12.2f}")
+    lines.append("")
+    lines.append(f"大写金额: {number_to_chinese(total_amount)}")
+    lines.append("-" * PAGE_WIDTH)
+    lines.append(f"备  注: {order.get('remark', '')}")
+    lines.append("-" * PAGE_WIDTH)
+    lines.append(f"制单人: {order.get('creatorName', '系统'):<25}审核人: ________________")
+    lines.append("")
+    lines.append(f"送货人: ________________             收货人: ________________")
+    lines.append("")
+    lines.append("")
+    lines.append("=" * PAGE_WIDTH)
     
     # 走纸
     lines.append("\n\n\n")

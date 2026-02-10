@@ -99,6 +99,10 @@
   color: #52c41a;
 }
 
+.order-status.voided {
+  color: #ff4d4f;
+}
+
 .fab {
   position: fixed;
   bottom: 40rpx;

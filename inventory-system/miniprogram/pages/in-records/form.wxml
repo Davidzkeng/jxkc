@@ -65,16 +65,6 @@
       <input class="form-input" type="digit" value="{{quantity}}" bindinput="onQuantityChange" placeholder="请输入入库数量(斤)" />
     </view>
 
-    <view class="form-item">
-      <text class="form-label">单价 *</text>
-      <input class="form-input" type="digit" value="{{price}}" bindinput="onPriceChange" placeholder="请输入单价" />
-    </view>
-
-    <view wx:if="{{totalAmount}}" class="form-item total-item">
-      <text class="form-label">入库总额</text>
-      <text class="total-amount">¥{{totalAmount}}</text>
-    </view>
-
     <view class="form-actions">
       <button class="submit-btn" loading="{{submitLoading}}" bindtap="submit">确认入库</button>
     </view>

@@ -5,24 +5,17 @@ Page({
   data: {
     // 原始数据
     products: [],
-    customers: [],
     
     // 选中的数据
     selectedProduct: null,
-    selectedCustomer: null,
     
     // 搜索相关
     productSearchKey: '',
-    customerSearchKey: '',
     filteredProducts: [],
-    filteredCustomers: [],
     showProductList: false,
-    showCustomerList: false,
     
     // 表单数据
     quantity: '',
-    price: '',
-    totalAmount: '',
     loading: false,
     submitLoading: false
   },
@@ -33,10 +26,9 @@ Page({
 
   loadData(options) {
     this.setData({ loading: true });
-    Promise.all([api.getProducts(), api.getCustomers()])
-      .then(([productsRes, customersRes]) => {
+    api.getProducts()
+      .then((productsRes) => {
         const products = Array.isArray(productsRes) ? productsRes : [];
-        const customers = Array.isArray(customersRes) ? customersRes : [];
         
         let selectedProduct = null;
         
@@ -48,9 +40,7 @@ Page({
         
         this.setData({
           products: products,
-          customers: customers,
           filteredProducts: products,
-          filteredCustomers: customers,
           selectedProduct: selectedProduct,
           loading: false
         });
@@ -94,8 +84,7 @@ Page({
 
   toggleProductList() {
     this.setData({
-      showProductList: !this.data.showProductList,
-      showCustomerList: false
+      showProductList: !this.data.showProductList
     });
   },
 
@@ -114,64 +103,10 @@ Page({
     });
   },
 
-  // 客户搜索
-  onCustomerSearchInput(e) {
-    const searchKey = e.detail.value;
-    this.setData({
-      customerSearchKey: searchKey,
-      showCustomerList: true,
-      filteredCustomers: this.filterCustomers(searchKey)
-    });
-  },
-
-  filterCustomers(searchKey) {
-    if (!searchKey) {
-      return this.data.customers;
-    }
-    return this.data.customers.filter(customer => 
-      customer.name.toLowerCase().includes(searchKey.toLowerCase()) ||
-      customer.contact.toLowerCase().includes(searchKey.toLowerCase()) ||
-      customer.phone.includes(searchKey)
-    );
-  },
-
-  toggleCustomerList() {
-    this.setData({
-      showCustomerList: !this.data.showCustomerList,
-      showProductList: false
-    });
-  },
-
-  selectCustomer(e) {
-    const customer = e.currentTarget.dataset.customer;
-    this.setData({
-      selectedCustomer: customer,
-      showCustomerList: false,
-      customerSearchKey: ''
-    });
-  },
-
-  clearSelectedCustomer() {
-    this.setData({
-      selectedCustomer: null
-    });
-  },
-
   onQuantityChange(e) {
     const quantity = e.detail.value;
-    const price = parseFloat(this.data.price);
     this.setData({
-      quantity: quantity,
-      totalAmount: price && quantity ? (price * parseFloat(quantity)).toFixed(2) : ''
-    });
-  },
-
-  onPriceChange(e) {
-    const price = e.detail.value;
-    const quantity = parseFloat(this.data.quantity);
-    this.setData({
-      price: price,
-      totalAmount: price && quantity ? (parseFloat(price) * quantity).toFixed(2) : ''
+      quantity: quantity
     });
   },
 
@@ -183,31 +118,21 @@ Page({
       return;
     }
 
-    if (!this.data.selectedCustomer) {
-      util.showError('请选择客户');
-      return;
-    }
-
     if (!this.data.quantity) {
       util.showError('请输入出库数量(斤)');
       return;
     }
 
-    if (!this.data.price) {
-      util.showError('请输入单价');
+    const quantity = parseFloat(this.data.quantity);
+    
+    if (isNaN(quantity) || quantity <= 0) {
+      util.showError('请输入有效的出库数量');
       return;
     }
 
-    const quantity = parseFloat(this.data.quantity);
-    const price = parseFloat(this.data.price);
-    const totalAmount = quantity * price;
-
     const data = {
       productId: this.data.selectedProduct.id,
-      customerId: this.data.selectedCustomer.id,
-      quantity: quantity,
-      price: price,
-      totalAmount: totalAmount
+      quantity: quantity
     };
 
     console.log('发送的数据:', data);

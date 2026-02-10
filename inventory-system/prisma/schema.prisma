@@ -41,6 +41,23 @@ model Product {
   outRecords       OutRecord[]
   inventoryChecks  InventoryCheck[]
   salesOrderProducts SalesOrderProduct[]
+  productUnits     ProductUnit[]
+}
+
+// 商品单位模型
+model ProductUnit {
+  id              Int       @id @default(autoincrement())
+  productId       Int
+  product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  unitName        String    // 单位名称（斤、件、箱、盒等）
+  conversionRate  Float     @default(1)  // 转换系数（相对于基本单位）
+  price           Decimal   @default(0.00)  // 该单位下的单价
+  isDefault       Boolean   @default(false)  // 是否默认单位
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  salesOrderProducts SalesOrderProduct[]  // 关联销售单商品
+  
+  @@unique([productId, unitName])
 }
 
 // 客户模型
@@ -86,17 +103,17 @@ model InRecord {
 
 // 出库单模型
 model OutRecord {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   productId   Int
-  product     Product  @relation(fields: [productId], references: [id])
-  customerId  Int
-  customer    Customer @relation(fields: [customerId], references: [id])
+  product     Product   @relation(fields: [productId], references: [id])
+  customerId  Int?
+  customer    Customer? @relation(fields: [customerId], references: [id])
   quantity    Int
-  price       Decimal
-  totalAmount Decimal  @default(0.00)
-  date        DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  price       Decimal   @default(0)
+  totalAmount Decimal   @default(0)
+  date        DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 // 库存盘点模型
@@ -131,14 +148,17 @@ model SalesOrder {
 model SalesOrderProduct {
   id            Int        @id @default(autoincrement())
   salesOrderId   Int
-  salesOrder    SalesOrder  @relation(fields: [salesOrderId], references: [id])
+  salesOrder    SalesOrder  @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
   productId     Int
   product       Product    @relation(fields: [productId], references: [id])
-  quantity      Int
-  price         Decimal
-  totalAmount   Decimal    @default(0.00)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  productUnitId Int?       // 可选，关联商品单位
+  productUnit   ProductUnit? @relation(fields: [productUnitId], references: [id])
+  quantity      Int        // 销售数量
+  baseQuantity  Float      @default(0) // 基本单位数量（转换后）
+  price         Decimal    @default(0) // 单价
+  totalAmount   Decimal    @default(0.00) // 小计金额
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   @@unique([salesOrderId, productId])
 }

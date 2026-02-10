@@ -4,6 +4,7 @@
     "pages/products/products",
     "pages/products/form",
     "pages/products/detail",
+    "pages/products/units",
     "pages/categories/categories",
     "pages/categories/form",
     "pages/customers/customers",

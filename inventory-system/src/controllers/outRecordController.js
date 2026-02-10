@@ -38,7 +38,7 @@ exports.getOutRecordById = async (req, res) => {
 // 创建出库记录
 exports.createOutRecord = async (req, res) => {
   try {
-    const { productId, customerId, quantity, price, date } = req.body;
+    const { productId, quantity, date } = req.body;
     
     // 检查产品库存
     const product = await prisma.product.findUnique({
@@ -53,17 +53,13 @@ exports.createOutRecord = async (req, res) => {
       return res.status(400).json({ error: '库存不足' });
     }
     
-    // 计算总金额
-    const totalAmount = parseFloat((quantity * parseFloat(price)).toFixed(2));
-    
-    // 创建出库记录
+    // 创建出库记录（不关联客户，不记录价格）
     const outRecord = await prisma.outRecord.create({
       data: {
-        productId,
-        customerId,
+        product: { connect: { id: productId } },
         quantity,
-        price,
-        totalAmount,
+        price: 0,
+        totalAmount: 0,
         date: date ? new Date(date) : new Date()
       }
     });
@@ -88,7 +84,7 @@ exports.createOutRecord = async (req, res) => {
 exports.updateOutRecord = async (req, res) => {
   try {
     const { id } = req.params;
-    const { productId, customerId, quantity, price, date } = req.body;
+    const { productId, quantity, date } = req.body;
     
     // 获取原出库记录
     const originalRecord = await prisma.outRecord.findUnique({
@@ -114,18 +110,12 @@ exports.updateOutRecord = async (req, res) => {
       return res.status(400).json({ error: '库存不足' });
     }
     
-    // 计算总金额
-    const totalAmount = parseFloat((quantity * parseFloat(price)).toFixed(2));
-    
-    // 更新出库记录
+    // 更新出库记录（不更新客户，不更新价格）
     const outRecord = await prisma.outRecord.update({
       where: { id: parseInt(id) },
       data: {
-        productId,
-        customerId,
+        product: { connect: { id: productId } },
         quantity,
-        price,
-        totalAmount,
         date: new Date(date)
       }
     });

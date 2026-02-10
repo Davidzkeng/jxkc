@@ -1,0 +1,149 @@
+.container {
+  padding: 20rpx;
+}
+
+.header {
+  margin-bottom: 30rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  display: block;
+}
+
+.subtitle {
+  font-size: 28rpx;
+  color: #666;
+  margin-top: 10rpx;
+  display: block;
+}
+
+.loading {
+  text-align: center;
+  padding: 100rpx;
+  color: #999;
+}
+
+.unit-list {
+  margin-bottom: 30rpx;
+}
+
+.unit-item {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.unit-info {
+  flex: 1;
+}
+
+.unit-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  display: block;
+}
+
+.unit-details {
+  margin-top: 10rpx;
+}
+
+.unit-details text {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 30rpx;
+}
+
+.default-tag {
+  display: inline-block;
+  background: #07c160;
+  color: #fff;
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
+  margin-top: 10rpx;
+}
+
+.unit-actions button {
+  margin-left: 16rpx;
+}
+
+.empty {
+  text-align: center;
+  padding: 60rpx;
+  color: #999;
+}
+
+.add-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #07c160;
+  color: #fff;
+  border-radius: 12rpx;
+  font-size: 32rpx;
+}
+
+.add-form {
+  background: #fff;
+  border-radius: 12rpx;
+  padding: 30rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.05);
+}
+
+.form-item {
+  margin-bottom: 24rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  display: block;
+  margin-bottom: 10rpx;
+}
+
+.form-input {
+  width: 100%;
+  height: 80rpx;
+  border: 1rpx solid #ddd;
+  border-radius: 8rpx;
+  padding: 0 20rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.hint {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+  display: block;
+}
+
+.switch-label {
+  font-size: 28rpx;
+  margin-left: 16rpx;
+}
+
+.form-actions {
+  display: flex;
+  margin-top: 30rpx;
+}
+
+.form-actions button {
+  flex: 1;
+  margin: 0 10rpx;
+}
+
+.form-actions button:first-child {
+  margin-left: 0;
+}
+
+.form-actions button:last-child {
+  margin-right: 0;
+}

@@ -1,4 +1,4 @@
-import prisma from '../server/prisma.js';
+const prisma = require('../server/prisma');
 
 // 获取所有销售单
 exports.getAllSalesOrders = async (req, res) => {
@@ -8,7 +8,8 @@ exports.getAllSalesOrders = async (req, res) => {
         customer: true,
         products: {
           include: {
-            product: true
+            product: true,
+            productUnit: true
           }
         }
       },
@@ -28,7 +29,17 @@ exports.getAllSalesOrders = async (req, res) => {
       status: order.status,
       productCount: order.products.length,
       totalAmount: order.products.reduce((sum, item) => sum + parseFloat(item.totalAmount) || 0, 0),
-      remark: order.remark
+      remark: order.remark,
+      products: order.products.map(item => ({
+        id: item.product.id,
+        name: item.product.name,
+        code: item.product.code,
+        productUnitId: item.productUnitId,
+        unitName: item.productUnit?.unitName || '斤',
+        quantity: item.quantity,
+        price: item.price,
+        totalAmount: item.totalAmount
+      }))
     }));
 
     res.json(formattedOrders);
@@ -47,7 +58,8 @@ exports.getSalesOrderById = async (req, res) => {
         customer: true,
         products: {
           include: {
-            product: true
+            product: true,
+            productUnit: true
           }
         }
       }
@@ -73,6 +85,8 @@ exports.getSalesOrderById = async (req, res) => {
         id: item.product.id,
         name: item.product.name,
         code: item.product.code,
+        productUnitId: item.productUnitId,
+        unitName: item.productUnit?.unitName || '斤',
         quantity: item.quantity,
         price: item.price,
         totalAmount: item.totalAmount
@@ -93,28 +107,50 @@ exports.createSalesOrder = async (req, res) => {
     // 生成销售单号
     const orderNumber = 'SO' + Date.now();
 
-    // 计算实际总金额并处理缺少price字段的情况
-    const processedProducts = products.map(item => {
+    // 处理商品数据，计算基本数量（转换为斤）
+    const processedProducts = await Promise.all(products.map(async (item) => {
       const productId = parseInt(item.productId);
       const quantity = parseFloat(item.quantity) || 0;
-      // 如果price存在则使用price，否则从totalAmount和quantity反推，或者使用0
-      let price = parseFloat(item.price);
-      if (isNaN(price) || !price) {
-        // 尝试从totalAmount和quantity反推价格
-        if (quantity > 0 && item.totalAmount) {
-          price = parseFloat(item.totalAmount) / quantity;
-        } else {
-          price = 0;
+      
+      // 获取商品单位信息
+      let unitPrice = parseFloat(item.price);
+      let baseQuantity = quantity;  // 默认基本数量等于销售数量
+      
+      if (item.productUnitId) {
+        const unit = await prisma.productUnit.findUnique({
+          where: { id: parseInt(item.productUnitId) }
+        });
+        if (unit) {
+          baseQuantity = quantity * unit.conversionRate;
+          if (!unitPrice || isNaN(unitPrice)) {
+            unitPrice = parseFloat(unit.price);
+          }
         }
       }
-      const totalAmount = price * quantity;
+      
+      // 如果没有提供单价，尝试获取默认单位单价
+      if (!unitPrice || isNaN(unitPrice)) {
+        const defaultUnit = await prisma.productUnit.findFirst({
+          where: { productId, isDefault: true }
+        });
+        if (defaultUnit) {
+          unitPrice = parseFloat(defaultUnit.price);
+        } else {
+          unitPrice = 0;
+        }
+      }
+      
+      const totalAmount = unitPrice * quantity;
+      
       return {
         productId,
+        productUnitId: item.productUnitId ? parseInt(item.productUnitId) : null,
         quantity,
-        price,
+        baseQuantity,  // 转换为基本单位（斤）的数量
+        price: unitPrice,
         totalAmount
       };
-    });
+    }));
 
     // 计算总金额
     const calculatedTotalAmount = processedProducts.reduce((sum, item) => {
@@ -130,26 +166,34 @@ exports.createSalesOrder = async (req, res) => {
         remark: remark || '',
         status: '已完成',
         products: {
-          create: processedProducts
+          create: processedProducts.map(item => ({
+            productId: item.productId,
+            productUnitId: item.productUnitId,
+            quantity: item.quantity,
+            baseQuantity: item.baseQuantity,
+            price: item.price,
+            totalAmount: item.totalAmount
+          }))
         }
       },
       include: {
         customer: true,
         products: {
           include: {
-            product: true
+            product: true,
+            productUnit: true
           }
         }
       }
     });
 
-    // 更新商品库存
-    for (const item of products) {
+    // 更新商品库存（按基本数量扣减）
+    for (const item of processedProducts) {
       await prisma.product.update({
-        where: { id: parseInt(item.productId) },
+        where: { id: item.productId },
         data: {
           stock: {
-            decrement: parseFloat(item.quantity)
+            decrement: item.baseQuantity
           }
         }
       });
@@ -169,118 +213,8 @@ exports.createSalesOrder = async (req, res) => {
         id: item.product.id,
         name: item.product.name,
         code: item.product.code,
-        quantity: item.quantity,
-        price: item.price,
-        totalAmount: item.totalAmount
-      }))
-    };
-
-    res.status(201).json(formattedOrder);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// 更新销售单
-exports.updateSalesOrder = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { customerId, products, remark, status } = req.body;
-
-    // 获取原销售单信息
-    const originalOrder = await prisma.salesOrder.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        products: true
-      }
-    });
-
-    if (!originalOrder) {
-      return res.status(404).json({ error: '销售单不存在' });
-    }
-
-    // 计算实际总金额
-    const calculatedTotalAmount = products ? products.reduce((sum, item) => {
-      const price = parseFloat(item.price) || 0;
-      const quantity = parseFloat(item.quantity) || 0;
-      return sum + (price * quantity);
-    }, 0) : 0;
-
-    // 更新销售单
-    const updatedOrder = await prisma.salesOrder.update({
-      where: { id: parseInt(id) },
-      data: {
-        customerId: parseInt(customerId),
-        totalAmount: calculatedTotalAmount,
-        remark: remark || '',
-        status: status || '已完成'
-      },
-      include: {
-        customer: true,
-        products: {
-          include: {
-            product: true
-          }
-        }
-      }
-    });
-
-    // 如果商品有变化，更新商品库存
-    if (products && products.length > 0) {
-      // 先恢复原销售单商品的库存
-      for (const item of originalOrder.products) {
-        await prisma.product.update({
-          where: { id: item.productId },
-          data: {
-            stock: {
-              increment: item.quantity
-            }
-          }
-        });
-      }
-
-      // 删除原销售单商品记录
-      await prisma.salesOrderProduct.deleteMany({
-        where: { salesOrderId: parseInt(id) }
-      });
-
-      // 创建新销售单商品记录并扣减库存
-      for (const item of products) {
-        await prisma.salesOrderProduct.create({
-          data: {
-            salesOrderId: parseInt(id),
-            productId: parseInt(item.productId),
-            quantity: parseFloat(item.quantity),
-            price: parseFloat(item.price),
-            totalAmount: parseFloat(item.totalAmount)
-          }
-        });
-
-        await prisma.product.update({
-          where: { id: parseInt(item.productId) },
-          data: {
-            stock: {
-              decrement: parseFloat(item.quantity)
-            }
-          }
-        });
-      }
-    }
-
-    // 格式化返回数据
-    const formattedOrder = {
-      id: updatedOrder.id,
-      orderNumber: updatedOrder.orderNumber,
-      customerName: updatedOrder.customer.name,
-      customerContact: updatedOrder.customer.contact,
-      customerPhone: updatedOrder.customer.phone,
-      createdAt: updatedOrder.createdAt.toISOString().split('T')[0],
-      status: updatedOrder.status,
-      remark: updatedOrder.remark,
-      products: updatedOrder.products.map(item => ({
-        id: item.product.id,
-        name: item.product.name,
-        code: item.product.code,
+        productUnitId: item.productUnitId,
+        unitName: item.productUnit?.unitName || '斤',
         quantity: item.quantity,
         price: item.price,
         totalAmount: item.totalAmount
@@ -310,13 +244,14 @@ exports.deleteSalesOrder = async (req, res) => {
       return res.status(404).json({ error: '销售单不存在' });
     }
 
-    // 恢复商品库存
+    // 恢复商品库存（使用 baseQuantity 按基本单位恢复）
     for (const item of salesOrder.products) {
+      const baseQty = item.baseQuantity || item.quantity;
       await prisma.product.update({
         where: { id: item.productId },
         data: {
           stock: {
-            increment: item.quantity
+            increment: baseQty
           }
         }
       });
@@ -328,6 +263,85 @@ exports.deleteSalesOrder = async (req, res) => {
     });
 
     res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// 作废销售单
+exports.voidSalesOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // 获取销售单信息
+    const salesOrder = await prisma.salesOrder.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        products: true
+      }
+    });
+
+    if (!salesOrder) {
+      return res.status(404).json({ error: '销售单不存在' });
+    }
+
+    if (salesOrder.status === '已作废') {
+      return res.status(400).json({ error: '该销售单已作废' });
+    }
+
+    // 恢复商品库存（使用 baseQuantity 按基本单位恢复）
+    for (const item of salesOrder.products) {
+      const baseQty = item.baseQuantity || item.quantity;
+      await prisma.product.update({
+        where: { id: item.productId },
+        data: {
+          stock: {
+            increment: baseQty
+          }
+        }
+      });
+    }
+
+    // 更新销售单状态为已作废
+    const updatedOrder = await prisma.salesOrder.update({
+      where: { id: parseInt(id) },
+      data: {
+        status: '已作废'
+      },
+      include: {
+        customer: true,
+        products: {
+          include: {
+            product: true,
+            productUnit: true
+          }
+        }
+      }
+    });
+
+    // 格式化返回数据
+    const formattedOrder = {
+      id: updatedOrder.id,
+      orderNumber: updatedOrder.orderNumber,
+      customerName: updatedOrder.customer.name,
+      customerContact: updatedOrder.customer.contact,
+      customerPhone: updatedOrder.customer.phone,
+      createdAt: updatedOrder.createdAt.toISOString().split('T')[0],
+      status: updatedOrder.status,
+      remark: updatedOrder.remark,
+      products: updatedOrder.products.map(item => ({
+        id: item.product.id,
+        name: item.product.name,
+        code: item.product.code,
+        productUnitId: item.productUnitId,
+        unitName: item.productUnit?.unitName || '斤',
+        quantity: item.quantity,
+        price: item.price,
+        totalAmount: item.totalAmount
+      }))
+    };
+
+    res.json(formattedOrder);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

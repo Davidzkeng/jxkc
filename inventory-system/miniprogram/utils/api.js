@@ -42,8 +42,9 @@ function request(options) {
           resolve(res.data);
         } else {
           console.error('API请求失败:', res);
+          const errorMsg = res.data?.error || `请求失败: ${res.statusCode}`;
           wx.showToast({
-            title: `请求失败: ${res.statusCode}`,
+            title: errorMsg,
             icon: 'none'
           });
           reject(res);
@@ -76,6 +77,12 @@ module.exports = {
   updateProduct: (id, data) => request({ url: `/products/${id}`, method: 'PUT', data }),
   deleteProduct: (id) => request({ url: `/products/${id}`, method: 'DELETE' }),
   getStockStats: () => request({ url: '/products/stats/stock', method: 'GET' }),
+
+  // 商品单位相关API
+  getProductUnits: (productId) => request({ url: `/products/${productId}/units`, method: 'GET' }),
+  createProductUnit: (data) => request({ url: '/product-units', method: 'POST', data }),
+  updateProductUnit: (id, data) => request({ url: `/product-units/${id}`, method: 'PUT', data }),
+  deleteProductUnit: (id) => request({ url: `/product-units/${id}`, method: 'DELETE' }),
 
   // 类别相关API
   getCategories: () => request({ url: '/categories', method: 'GET' }),
@@ -116,7 +123,7 @@ module.exports = {
   getSalesOrders: () => request({ url: '/sales-orders', method: 'GET' }),
   getSalesOrderById: (id) => request({ url: `/sales-orders/${id}`, method: 'GET' }),
   createSalesOrder: (data) => request({ url: '/sales-orders', method: 'POST', data }),
-  updateSalesOrder: (id, data) => request({ url: `/sales-orders/${id}`, method: 'PUT', data }),
+  voidSalesOrder: (id) => request({ url: `/sales-orders/${id}/void`, method: 'POST' }),
   deleteSalesOrder: (id) => request({ url: `/sales-orders/${id}`, method: 'DELETE' }),
 
   // 打印任务相关API

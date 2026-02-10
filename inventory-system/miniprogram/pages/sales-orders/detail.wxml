@@ -29,7 +29,7 @@
         </view>
         <view class="info-row">
           <text class="info-label">状态:</text>
-          <text class="info-value status">{{order.status}}</text>
+          <text class="info-value status {{order.status === '已作废' ? 'voided' : ''}}">{{order.status}}</text>
         </view>
       </view>
 
@@ -42,7 +42,7 @@
               <text class="product-code">编码: {{item.code}}</text>
             </view>
             <view class="product-details">
-              <text class="product-quantity">数量: {{item.quantity}}</text>
+              <text class="product-quantity">数量: {{item.quantity}}{{item.unitName}}</text>
               <text class="product-price">单价: ¥{{item.price}}</text>
               <text class="product-total">小计: ¥{{item.totalAmount}}</text>
             </view>
@@ -67,6 +67,9 @@
     </view>
 
     <view class="actions">
+      <button wx:if="{{order.status !== '已作废'}}" class="action-btn void-btn" bindtap="voidOrder">
+        作废
+      </button>
       <button class="action-btn print-btn" bindtap="printOrder">
         <text class="btn-icon">🖨️</text>
         <text class="btn-text">打印</text>

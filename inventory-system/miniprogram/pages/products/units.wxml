@@ -1,0 +1,66 @@
+<view class="container">
+  <view class="header">
+    <text class="title">商品单位管理</text>
+    <text class="subtitle">{{productName}}</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:else class="content">
+    <!-- 单位列表 -->
+    <view class="unit-list">
+      <view class="unit-item" wx:for="{{units}}" wx:key="id">
+        <view class="unit-info">
+          <text class="unit-name">{{item.unitName}}</text>
+          <view class="unit-details">
+            <text>转换系数: {{item.conversionRate}}</text>
+            <text>单价: ¥{{item.price}}</text>
+          </view>
+          <text class="default-tag" wx:if="{{item.isDefault}}">默认</text>
+        </view>
+        <view class="unit-actions">
+          <button wx:if="{{!item.isDefault}}" size="mini" type="primary" bindtap="setDefault" data-id="{{item.id}}">设为默认</button>
+          <button wx:if="{{units.length > 1}}" size="mini" type="warn" bindtap="deleteUnit" data-id="{{item.id}}">删除</button>
+        </view>
+      </view>
+
+      <view class="empty" wx:if="{{units.length === 0}}">
+        <text>暂无销售单位，点击下方添加</text>
+      </view>
+    </view>
+
+    <!-- 添加单位按钮 -->
+    <button class="add-btn" bindtap="toggleAddForm" wx:if="{{!showAddForm}}">+ 添加销售单位</button>
+
+    <!-- 添加单位表单 -->
+    <view class="add-form" wx:if="{{showAddForm}}">
+      <view class="form-item">
+        <text class="form-label">单位名称</text>
+        <input class="form-input" placeholder="如：斤、件、箱、盒" value="{{unitName}}" bindinput="onUnitNameChange" />
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">转换系数</text>
+        <input class="form-input" type="digit" placeholder="相对于基本单位（斤）的系数" value="{{conversionRate}}" bindinput="onConversionRateChange" />
+        <text class="hint">例如：1件=10斤，则填写10</text>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">销售单价</text>
+        <input class="form-input" type="digit" placeholder="请输入单价" value="{{unitPrice}}" bindinput="onUnitPriceChange" />
+      </view>
+
+      <view class="form-item">
+        <switch checked="{{isDefault}}" bindchange="onIsDefaultChange" />
+        <text class="switch-label">设为默认单位</text>
+      </view>
+
+      <view class="form-actions">
+        <button bindtap="toggleAddForm">取消</button>
+        <button type="primary" loading="{{submitLoading}}" bindtap="submitUnit">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

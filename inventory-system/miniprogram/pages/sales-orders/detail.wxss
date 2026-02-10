@@ -76,6 +76,10 @@
   font-weight: 500;
 }
 
+.info-value.status.voided {
+  color: #ff4d4f;
+}
+
 .products-section {
   padding: 24rpx 32rpx;
 }
@@ -201,6 +205,14 @@
 
 .back-btn:active {
   background: #e8e8e8;
+}
+
+.void-btn {
+  background: #ff4d4f;
+}
+
+.void-btn:active {
+  background: #cf1322;
 }
 
 .btn-icon {

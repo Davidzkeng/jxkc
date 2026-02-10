@@ -44,6 +44,7 @@
           </view>
         </view>
         <view class="product-actions">
+          <button class="action-btn units" bindtap="navigateToUnits" data-id="{{item.id}}">管理单位</button>
           <button class="action-btn edit" bindtap="navigateToEdit" data-id="{{item.id}}">编辑</button>
           <button class="action-btn delete" bindtap="deleteProduct" data-id="{{item.id}}">删除</button>
         </view>
