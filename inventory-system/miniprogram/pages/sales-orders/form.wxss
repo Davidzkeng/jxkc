@@ -136,69 +136,179 @@
 
 /* 已选商品样式 */
 .selected-products {
-  background: #f9f9f9;
-  border-radius: 8rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
   padding: 16rpx;
 }
 
 .selected-product-item {
   background: #fff;
-  border-radius: 8rpx;
+  border-radius: 12rpx;
   padding: 20rpx;
   margin-bottom: 16rpx;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
 }
 
 .selected-product-item:last-child {
   margin-bottom: 0;
 }
 
-.product-info {
+/* 商品头部信息 */
+.product-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 16rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.product-info {
+  flex: 1;
 }
 
 .product-name {
   display: block;
-  font-size: 28rpx;
+  font-size: 30rpx;
   color: #333;
-  font-weight: 500;
-  margin-bottom: 8rpx;
+  font-weight: 600;
+  margin-bottom: 6rpx;
 }
 
 .product-code {
   display: block;
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #999;
 }
 
+.product-subtotal {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8rpx;
+}
+
+.subtotal-price {
+  font-size: 32rpx;
+  color: #ff4d4f;
+  font-weight: 600;
+}
+
+/* 商品操作区域 */
 .product-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+/* 单位价格行 */
+.unit-price-row {
   display: flex;
   align-items: center;
   gap: 16rpx;
 }
 
-.quantity-input {
+.unit-text {
+  font-size: 26rpx;
+  color: #666;
+  background: #f0f0f0;
+  padding: 4rpx 16rpx;
+  border-radius: 6rpx;
+}
+
+.unit-picker {
   flex: 1;
-  height: 64rpx;
-  line-height: 64rpx;
-  font-size: 28rpx;
-  color: #333;
+}
+
+.picker {
+  font-size: 26rpx;
+  color: #1890ff;
+  background: #e6f7ff;
+  padding: 8rpx 16rpx;
+  border-radius: 6rpx;
+  display: inline-block;
+}
+
+.price-input-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
   background: #f5f5f5;
   border-radius: 8rpx;
   padding: 0 16rpx;
-  box-sizing: border-box;
+  height: 56rpx;
 }
 
-.price {
+.price-symbol {
+  font-size: 26rpx;
+  color: #666;
+  margin-right: 4rpx;
+}
+
+.price-input {
+  flex: 1;
   font-size: 28rpx;
-  color: #ff4d4f;
-  font-weight: 600;
+  color: #333;
+  height: 100%;
+  line-height: 56rpx;
+}
+
+/* 数量行 */
+.quantity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.quantity-label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.quantity-btn {
+  width: 64rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  text-align: center;
+  font-size: 32rpx;
+  color: #333;
+  background: #e0e0e0;
+}
+
+.quantity-btn.minus {
+  border-radius: 8rpx 0 0 8rpx;
+}
+
+.quantity-btn.plus {
+  border-radius: 0 8rpx 8rpx 0;
+}
+
+.quantity-btn:active {
+  background: #d0d0d0;
+}
+
+.quantity-input {
+  width: 100rpx;
+  height: 56rpx;
+  line-height: 56rpx;
+  font-size: 28rpx;
+  color: #333;
+  text-align: center;
+  background: transparent;
 }
 
 .remove-btn {
   font-size: 24rpx;
   color: #ff4d4f;
-  cursor: pointer;
+  padding: 4rpx 8rpx;
 }
 
 .remove-btn:active {

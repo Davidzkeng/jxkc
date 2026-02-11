@@ -92,64 +92,73 @@
 
     <!-- 已选商品列表 -->
     <view class="form-item" wx:if="{{selectedProducts.length > 0}}">
-      <text class="form-label">已选商品</text>
+      <text class="form-label">已选商品 ({{selectedProducts.length}})</text>
       <view class="selected-products">
         <view 
           class="selected-product-item" 
           wx:for="{{selectedProducts}}" 
           wx:key="id"
         >
-          <view class="product-info">
-            <text class="product-name">{{item.name}}</text>
-            <text class="product-code">编码: {{item.code}}</text>
-          </view>
-          <view class="product-row">
-            <!-- 单位选择 -->
-            <view class="unit-picker" wx:if="{{item.units.length > 1}}">
-              <picker 
-                mode="selector" 
-                range="{{item.units}}" 
-                range-key="unitName"
-                value="{{item.unitsIndex || 0}}"
-                bindchange="onUnitChange"
-                data-index="{{index}}"
-              >
-                <view class="picker">
-                  {{item.selectedUnit.unitName}} ▾
-                </view>
-              </picker>
+          <!-- 商品信息 -->
+          <view class="product-header">
+            <view class="product-info">
+              <text class="product-name">{{item.name}}</text>
+              <text class="product-code">{{item.code}}</text>
             </view>
-            <text wx:else class="unit-text">{{item.selectedUnit.unitName}}</text>
-            <!-- 单价 -->
-            <view class="price-container red-amount">
-              <text class="price-symbol">¥</text>
-              <input 
-                class="price-input" 
-                type="number" 
-                placeholder="0.00" 
-                value="{{item.selectedUnit.price}}" 
-                bindinput="onPriceChange" 
-                data-index="{{index}}"
-              />
+            <view class="product-subtotal">
+              <text class="subtotal-price">¥{{item.subtotal}}</text>
+              <text class="remove-btn" bindtap="removeProduct" data-index="{{index}}">删除</text>
             </view>
           </view>
+          
+          <!-- 操作区域 -->
           <view class="product-actions">
-            <view class="quantity-container">
-              <text class="quantity-btn minus" bindtap="decreaseQuantity" data-index="{{index}}">-</text>
-              <input 
-                class="quantity-input" 
-                type="number" 
-                placeholder="1" 
-                value="{{item.quantity}}" 
-                bindinput="onQuantityChange" 
-                data-index="{{index}}"
-              />
-              <text class="quantity-btn plus" bindtap="increaseQuantity" data-index="{{index}}">+</text>
+            <!-- 单位选择 -->
+            <view class="unit-price-row">
+              <view class="unit-picker" wx:if="{{item.units.length > 1}}">
+                <picker 
+                  mode="selector" 
+                  range="{{item.units}}" 
+                  range-key="unitName"
+                  value="{{item.unitsIndex || 0}}"
+                  bindchange="onUnitChange"
+                  data-index="{{index}}"
+                >
+                  <view class="picker">
+                    {{item.selectedUnit.unitName}} ▾
+                  </view>
+                </picker>
+              </view>
+              <text wx:else class="unit-text">{{item.selectedUnit.unitName}}</text>
+              
+              <view class="price-input-wrapper">
+                <text class="price-symbol">¥</text>
+                <input 
+                  class="price-input" 
+                  type="digit" 
+                  placeholder="0.00" 
+                  value="{{item.selectedUnit.price}}" 
+                  bindinput="onPriceChange" 
+                  data-index="{{index}}"
+                />
+              </view>
             </view>
-            <text class="remove-btn" bindtap="removeProduct" data-index="{{index}}">删除</text>
-          </view>
-          <view class="product-subtotal">
-            <text>小计: ¥{{item.subtotal}}</text>
+            
+            <!-- 数量操作 -->
+            <view class="quantity-row">
+              <text class="quantity-label">数量</text>
+              <view class="quantity-controls">
+                <text class="quantity-btn minus" bindtap="decreaseQuantity" data-index="{{index}}">-</text>
+                <input 
+                  class="quantity-input" 
+                  type="digit" 
+                  value="{{item.quantity}}" 
+                  bindinput="onQuantityChange" 
+                  data-index="{{index}}"
+                />
+                <text class="quantity-btn plus" bindtap="increaseQuantity" data-index="{{index}}">+</text>
+              </view>
+            </view>
           </view>
         </view>
       </view>

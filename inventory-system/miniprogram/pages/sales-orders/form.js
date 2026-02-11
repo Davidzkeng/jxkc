@@ -207,7 +207,7 @@ Page({
     const price = product.selectedUnit?.price || product.price || 0;
     
     const updatedProducts = [...selectedProducts];
-    const newQuantity = (updatedProducts[index].quantity || 0) + 1;
+    const newQuantity = parseFloat(((updatedProducts[index].quantity || 0) + 0.5).toFixed(1));
     updatedProducts[index] = {
       ...updatedProducts[index],
       quantity: newQuantity,
@@ -228,47 +228,12 @@ Page({
     const price = product.selectedUnit?.price || product.price || 0;
     
     const updatedProducts = [...selectedProducts];
-    const newQuantity = Math.max((updatedProducts[index].quantity || 0) - 1, 1);
+    const currentQty = updatedProducts[index].quantity || 0;
+    const newQuantity = parseFloat(Math.max(currentQty - 0.5, 0.1).toFixed(1));
     updatedProducts[index] = {
       ...updatedProducts[index],
       quantity: newQuantity,
       subtotal: price * newQuantity
-    };
-    
-    this.setData({
-      selectedProducts: updatedProducts
-    });
-    
-    this.calculateTotalAmount();
-  },
-
-  increaseQuantity(e) {
-    const index = e.currentTarget.dataset.index;
-    const selectedProducts = this.data.selectedProducts;
-    
-    // 创建新数组，避免直接修改原数组
-    const updatedProducts = [...selectedProducts];
-    updatedProducts[index] = {
-      ...updatedProducts[index],
-      quantity: (updatedProducts[index].quantity || 0) + 0.5
-    };
-    
-    this.setData({
-      selectedProducts: updatedProducts
-    });
-    
-    this.calculateTotalAmount();
-  },
-
-  decreaseQuantity(e) {
-    const index = e.currentTarget.dataset.index;
-    const selectedProducts = this.data.selectedProducts;
-    
-    // 创建新数组，避免直接修改原数组
-    const updatedProducts = [...selectedProducts];
-    updatedProducts[index] = {
-      ...updatedProducts[index],
-      quantity: Math.max((updatedProducts[index].quantity || 0) - 0.5, 0.5) // 确保数量不小于0.5斤
     };
     
     this.setData({

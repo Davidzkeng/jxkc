@@ -42,7 +42,7 @@
               <text class="product-code">编码: {{item.code}}</text>
             </view>
             <view class="product-details">
-              <text class="product-quantity">数量: {{item.quantity}}{{item.unitName}}</text>
+              <text class="product-quantity">数量: {{item.quantity % 1 === 0 ? item.quantity : item.quantity.toFixed(1)}}{{item.unitName}}</text>
               <text class="product-price">单价: ¥{{item.price}}</text>
               <text class="product-total">小计: ¥{{item.totalAmount}}</text>
             </view>

@@ -43,7 +43,7 @@
       <view class="table-row" wx:for="{{order.products}}" wx:key="id">
         <view class="td td-index">{{item.code || ''}}</view>
         <view class="td td-name">{{item.name || ''}}</view>
-        <view class="td td-qty">{{item.quantity || ''}}</view>
+        <view class="td td-qty">{{item.quantity % 1 === 0 ? item.quantity : item.quantity.toFixed(1)}}</view>
         <view class="td td-unit">{{item.unitName || '斤'}}</view>
         <view class="td td-price">{{item.price ? '¥' + item.price : ''}}</view>
         <view class="td td-amount">{{item.totalAmount ? '¥' + item.totalAmount : ''}}</view>
