@@ -113,9 +113,8 @@ def create_print_content(job):
     lines = []
     
     # ========== 标题区域 ==========
-    lines.append("=" * PAGE_WIDTH)
     lines.append("                                  销 售 单 据")
-    lines.append("=" * PAGE_WIDTH)
+    lines.append("-" * PAGE_WIDTH)
     
     # ========== 订单信息 ==========
     order_date = ''
@@ -134,7 +133,8 @@ def create_print_content(job):
     lines.append(f"客户名称: {customer.get('name', '')}")
     lines.append(f"联系电话: {customer.get('phone', '')}")
     lines.append("-" * PAGE_WIDTH)
-    lines.append(" 序号   商品名称            单  位         数  量      单  价(元)    金  额(元)")
+    # 表头带竖线
+    lines.append(f"|{pad_text('序号', 6)}|{pad_text('商品名称', 16)}|{pad_text('规格', 10)}|{pad_text('单位', 12)}|{pad_text('数量', 12)}|{pad_text('单价(元)', 14)}|{pad_text('金额(元)', 12)}|")
     lines.append("-" * PAGE_WIDTH)
     
     # ========== 商品明细 ==========
@@ -154,26 +154,20 @@ def create_print_content(job):
         price = float(item.get('price', 0))
         amount = float(item.get('totalAmount', 0))
         
-        # 使用pad_text处理中英文混合对齐
-        line = f"{pad_text(idx, 6)}{pad_text(name, 16)}{pad_text(spec, 10)}{pad_text(unit, 12)}{pad_text(qty, 12)}{pad_text(f'{price:.2f}', 14)}{pad_text(f'{amount:.2f}', 12)}"
+        # 使用pad_text处理中英文混合对齐，带竖线
+        line = f"|{pad_text(idx, 6)}|{pad_text(name, 16)}|{pad_text(spec, 10)}|{pad_text(unit, 12)}|{pad_text(qty, 12)}|{pad_text(f'{price:.2f}', 14)}|{pad_text(f'{amount:.2f}', 12)}|"
         lines.append(line)
         
         total_amount += amount
     
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"                                              合  计: {total_items}种商品    {total_amount:<12.2f}")
-    lines.append("")
-    lines.append(f"大写金额: {number_to_chinese(total_amount)}")
+    lines.append(f"|{pad_text('', 6)}|{pad_text('', 16)}|{pad_text('', 10)}|{pad_text('', 12)}|{pad_text('合计', 12)}|{pad_text(f'{total_items}种', 14)}|{pad_text(f'{total_amount:.2f}', 12)}|")
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"备  注: {order.get('remark', '')}")
-    lines.append("-" * PAGE_WIDTH)
-    lines.append(f"制单人: {order.get('creatorName', '系统'):<25}审核人: ________________")
     lines.append("")
-    lines.append(f"送货人: ________________             收货人: ________________")
+    lines.append(f"客户签名: ________________")
     lines.append("")
     lines.append("")
-    lines.append("=" * PAGE_WIDTH)
-    
+
     # 走纸
     lines.append("\n\n\n")
     
