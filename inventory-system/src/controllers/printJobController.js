@@ -61,6 +61,7 @@ exports.getPendingPrintJobs = async (req, res) => {
             customer: true,
             products: {
               include: {
+                productUnit: true,
                 product: {
                   include: {
                     category: true

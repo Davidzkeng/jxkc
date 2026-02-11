@@ -15,9 +15,9 @@ import requests
 from datetime import datetime
 
 # API配置
-API_BASE_URL = os.environ.get("PRINT_API_URL", "http://localhost:3001/api")
+API_BASE_URL = os.environ.get("PRINT_API_URL", "https://store.dove521.cn/api")
 POLL_INTERVAL = int(os.environ.get("PRINT_POLL_INTERVAL", "5"))
-DEFAULT_PRINTER = os.environ.get("CUPS_PRINTER", "default")
+DEFAULT_PRINTER = os.environ.get("CUPS_PRINTER", "print_service_text")
 
 # 纸张宽度240mm，每字符4mm，总宽度60字符
 PAGE_WIDTH = 60
@@ -60,6 +60,47 @@ def right_text(text, width):
     return ' ' * (width - len(text)) + text
 
 
+def display_width(text):
+    """计算文本的显示宽度，中文字符算2个宽度"""
+    width = 0
+    for char in str(text):
+        if '\u4e00' <= char <= '\u9fff':  # 中文字符范围
+            width += 2
+        else:
+            width += 1
+    return width
+
+
+def pad_text(text, width, align='left'):
+    """填充文本到指定显示宽度
+    align: 'left' | 'right' | 'center'
+    """
+    text = str(text)
+    current_width = display_width(text)
+    
+    if current_width >= width:
+        # 如果超出宽度，需要截断
+        result = ''
+        current = 0
+        for char in text:
+            char_width = 2 if '\u4e00' <= char <= '\u9fff' else 1
+            if current + char_width > width:
+                break
+            result += char
+            current += char_width
+        return result
+    
+    padding = width - current_width
+    if align == 'left':
+        return text + ' ' * padding
+    elif align == 'right':
+        return ' ' * padding + text
+    else:  # center
+        left = padding // 2
+        right = padding - left
+        return ' ' * left + text + ' ' * right
+
+
 def create_print_content(job):
     """创建纯文本打印内容 - 90字符宽度，适合针式打印机"""
     order = job.get("order", {})
@@ -92,32 +133,35 @@ def create_print_content(job):
     lines.append("-" * PAGE_WIDTH)
     lines.append(f"客户名称: {customer.get('name', '')}")
     lines.append(f"联系电话: {customer.get('phone', '')}")
-    lines.append(f"客户地址: {customer.get('address', '')}")
     lines.append("-" * PAGE_WIDTH)
-    lines.append(" 序号   商品名称            规  格         单  位         数  量      单  价(元)    金  额(元)")
+    lines.append(" 序号   商品名称            单  位         数  量      单  价(元)    金  额(元)")
     lines.append("-" * PAGE_WIDTH)
     
     # ========== 商品明细 ==========
-    total_qty = 0
+    total_items = len(products)  # 商品种类数
     total_amount = 0.0
     
     for idx, item in enumerate(products, 1):
         product = item.get("product", {})
-        name = product.get('name', '')[:16]
-        spec = product.get('spec', '')[:8]
-        unit = item.get('unit', '个')[:4]
+        # 从productUnit获取单位名称
+        product_unit = item.get("productUnit", {})
+        unit = product_unit.get('unitName', '') or product.get('unitName', '') or product.get('unit', '') or '个'
+        unit = unit[:4]
+        
+        name = product.get('name', '')
+        spec = product.get('spec', '')
         qty = item.get('quantity', 0)
         price = float(item.get('price', 0))
         amount = float(item.get('totalAmount', 0))
         
-        line = f"{idx:<6}{name:<16}{spec:<10}{unit:<8}{qty:<10}{price:<12.2f}{amount:<12.2f}"
+        # 使用pad_text处理中英文混合对齐
+        line = f"{pad_text(idx, 6)}{pad_text(name, 16)}{pad_text(spec, 10)}{pad_text(unit, 12)}{pad_text(qty, 12)}{pad_text(f'{price:.2f}', 14)}{pad_text(f'{amount:.2f}', 12)}"
         lines.append(line)
         
-        total_qty += qty
         total_amount += amount
     
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"                                              合  计:               {total_qty:<8}{total_amount:<12.2f}")
+    lines.append(f"                                              合  计: {total_items}种商品    {total_amount:<12.2f}")
     lines.append("")
     lines.append(f"大写金额: {number_to_chinese(total_amount)}")
     lines.append("-" * PAGE_WIDTH)
@@ -207,7 +251,12 @@ def cups_print_text(printer_name, content):
             f.flush()
             temp_file = f.name
         
-        cmd = ['lp', '-d', printer_name, '-o', 'raw', '-o', 'media=24x14cm', temp_file]
+        # 如果打印机名称为空，使用默认打印机
+        if not printer_name or printer_name == 'default':
+            cmd = ['lp', '-o', 'raw', '-o', 'media=24x14cm', temp_file]
+        else:
+            cmd = ['lp', '-d', printer_name, '-o', 'raw', '-o', 'media=24x14cm', temp_file]
+        
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         os.unlink(temp_file)
         
@@ -248,6 +297,13 @@ def process_print_job(job):
     job_id = job['id']
     print(f"处理任务 #{job_id}")
     
+    # 调试：打印数据结构
+    order = job.get("order", {})
+    products = order.get("products", [])
+    if products:
+        print(f"商品数据结构: {products[0].keys()}")
+        print(f"商品字段名: {list(products[0].keys())}")
+    
     try:
         update_job_status(job_id, 'processing', printer_name=DEFAULT_PRINTER)
         content = create_print_content(job)
@@ -279,9 +335,10 @@ def test_print_content():
             },
             "products": [
                 {
-                    "product": {"name": "苹果"},
+                    "product": {"name": "苹果醋"},
                     "quantity": 10.5,
                     "price": 5.50,
+                    "unitName": "斤",
                     "totalAmount": 57.75,
                     "remark": "新鲜"
                 },
@@ -289,6 +346,7 @@ def test_print_content():
                     "product": {"name": "香蕉"},
                     "quantity": 20,
                     "price": 3.00,
+                    "unitName": "斤",
                     "totalAmount": 60.00,
                     "remark": ""
                 },
@@ -296,6 +354,7 @@ def test_print_content():
                     "product": {"name": "橙子"},
                     "quantity": 15.5,
                     "price": 4.50,
+                    "unitName": "斤",
                     "totalAmount": 69.75,
                     "remark": "甜"
                 }
