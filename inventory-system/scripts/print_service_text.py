@@ -12,7 +12,7 @@ import time
 import tempfile
 import subprocess
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # API配置
 API_BASE_URL = os.environ.get("PRINT_API_URL", "https://store.dove521.cn/api")
@@ -122,17 +122,19 @@ def create_print_content(job):
     if order.get('createdAt', ''):
         try:
             dt = datetime.fromisoformat(order.get('createdAt', '').replace('Z', '+00:00'))
+            # 转换为本地时间 (UTC+8)
+            dt = dt.replace(tzinfo=None) + timedelta(hours=8)
             order_date = dt.strftime('%Y-%m-%d')
             order_time = dt.strftime('%H:%M:%S')
         except:
             pass
     
     order_number = order.get('orderNumber', '')
-    lines.append(f"单号: {order_number:<30}日  期: {order_date:<15}时  间: {order_time}")
+    # 单号信息行 - 90字符宽度：|单号: xxx        日期: xxx         时间: xxx        |
+    lines.append(f"|单号: {order_number:<26}日  期: {order_date:<11}时  间: {order_time:<11}|")
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"客户名称: {customer.get('name', '')}")
-    lines.append(f"联系电话: {customer.get('phone', '')}")
-    lines.append("-" * PAGE_WIDTH)
+    lines.append(f"|客户名称: {customer.get('name', ''):<76}|")
+    lines.append(f"|联系电话: {customer.get('phone', ''):<75}|")
     # 表头 - 只保留左右竖线
     lines.append(f"|{pad_text('序号', 6, 'center')}{pad_text('商品名称', 22, 'center')}{pad_text('单位', 12, 'center')}{pad_text('数量', 12, 'center')}{pad_text('单价(元)', 14, 'center')}{pad_text('金额(元)', 16, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
@@ -159,8 +161,8 @@ def create_print_content(job):
         
         total_amount += amount
     
-    # 如果商品数据少于6行，补充空行至6行
-    remaining_lines = 6 - total_items
+    # 如果商品数据少于12行，补充空行至12行
+    remaining_lines = 12 - total_items
     for i in range(max(0, remaining_lines)):
         lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('', 12)}{pad_text('', 14)}{pad_text('', 16)}|")
     
