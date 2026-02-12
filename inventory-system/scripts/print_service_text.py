@@ -131,12 +131,14 @@ def create_print_content(job):
     
     order_number = order.get('orderNumber', '')
     # 单号信息行 - 90字符宽度：|单号: xxx        日期: xxx         时间: xxx        |
-    lines.append(f"|单号: {order_number:<26}日  期: {order_date:<11}时  间: {order_time:<11}|")
+    lines.append(f"|单号: {order_number:<48}日  期: {order_date}时  间: {order_time}|")
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"|客户名称: {customer.get('name', ''):<76}|")
-    lines.append(f"|联系电话: {customer.get('phone', ''):<75}|")
+    lines.append(f"|客户名称: {customer.get('name', ''):<74}|")
+    lines.append(f"|联系电话: {customer.get('phone', ''):<78}|")
+    lines.append("-" * PAGE_WIDTH)
+
     # 表头 - 只保留左右竖线
-    lines.append(f"|{pad_text('序号', 6, 'center')}{pad_text('商品名称', 22, 'center')}{pad_text('单位', 12, 'center')}{pad_text('数量', 12, 'center')}{pad_text('单价(元)', 14, 'center')}{pad_text('金额(元)', 16, 'center')}|")
+    lines.append(f"|{pad_text('序号', 6, 'center')}{pad_text('商品名称', 22, 'center')}{pad_text('单位', 12, 'center')}{pad_text('数量', 12, 'center')}{pad_text('单价(元)', 14, 'center')}{pad_text('金额(元)', 22, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
     
     # ========== 商品明细 ==========
@@ -156,18 +158,18 @@ def create_print_content(job):
         amount = float(item.get('totalAmount', 0))
 
         # 使用pad_text处理中英文混合对齐，只保留左右竖线
-        line = f"|{pad_text(idx, 6, 'center')}{pad_text(name, 22, 'center')}{pad_text(unit, 12, 'center')}{pad_text(qty, 12, 'center')}{pad_text(f'{price:.2f}', 14, 'center')}{pad_text(f'{amount:.2f}', 16, 'center')}|"
+        line = f"|{pad_text(idx, 6, 'center')}{pad_text(name, 22, 'center')}{pad_text(unit, 12, 'center')}{pad_text(qty, 12, 'center')}{pad_text(f'{price:.2f}', 14, 'center')}{pad_text(f'{amount:.2f}', 22, 'center')}|"
         lines.append(line)
         
         total_amount += amount
     
     # 如果商品数据少于12行，补充空行至12行
-    remaining_lines = 12 - total_items
+    remaining_lines = 10 - total_items
     for i in range(max(0, remaining_lines)):
-        lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('', 12)}{pad_text('', 14)}{pad_text('', 16)}|")
+        lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('', 12)}{pad_text('', 14)}{pad_text('', 22)}|")
     
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('合计', 12, 'center')}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 16, 'center')}|")
+    lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('合计', 12, 'center')}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 22, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
     lines.append("")
     lines.append(f"客户签名: ________________")
