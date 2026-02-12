@@ -60,20 +60,17 @@ def cups_print(printer_name, content):
         
         result = subprocess.run(
             cmd,
-            capture_output=True,
-            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             timeout=30
         )
-        
-        # 删除临时文件
         os.unlink(temp_file)
         
         if result.returncode == 0:
-            # lp命令成功，返回job ID
-            job_id = result.stdout.strip()
+            job_id = result.stdout.decode('utf-8', errors='replace').strip()
             return True, job_id, None
         else:
-            return False, None, result.stderr
+            return False, None, result.stderr.decode('utf-8', errors='replace')
     
     except subprocess.TimeoutExpired:
         return False, None, "打印超时"
@@ -86,13 +83,14 @@ def get_cups_printers():
     try:
         result = subprocess.run(
             ['lpstat', '-v'],
-            capture_output=True,
-            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             timeout=10
         )
         if result.returncode == 0:
+            stdout_text = result.stdout.decode('utf-8', errors='replace')
             printers = []
-            for line in result.stdout.split('\n'):
+            for line in stdout_text.split('\n'):
                 if 'device for' in line:
                     parts = line.split('device for')
                     if len(parts) >= 2:

@@ -58,11 +58,11 @@ def connect_printer(printer_name):
     try:
         # 使用lpstat获取打印机URI
         result = subprocess.run(['lpstat', '-v', printer_name], 
-                              capture_output=True, text=True)
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if result.returncode == 0:
-            # 格式: device for printer: socket://192.168.101.113:9100
+            stdout_text = result.stdout.decode('utf-8', errors='replace')
             import re
-            match = re.search(r'(socket|ipp|http)://([^\s:]+)(?::(\d+))?', result.stdout)
+            match = re.search(r'(socket|ipp|http)://([^\s:]+)(?::(\d+))?', stdout_text)
             if match:
                 host = match.group(2)
                 port = int(match.group(3) or 9100)
@@ -90,7 +90,7 @@ def print_text_direct(sock, text):
             f.write(text)
             f.flush()
             result = subprocess.run(['lp', '-d', DEFAULT_PRINTER, f.name], 
-                                  capture_output=True, text=True)
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             os.unlink(f.name)
             return result.returncode == 0
 
@@ -197,13 +197,13 @@ def cups_print_text(printer_name, content):
             temp_file = f.name
         
         cmd = ['lp', '-d', printer_name, '-o', 'raw', '-o', 'media=24x14cm', temp_file]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
         os.unlink(temp_file)
         
         if result.returncode == 0:
-            return True, result.stdout.strip(), None
+            return True, result.stdout.decode('utf-8', errors='replace').strip(), None
         else:
-            return False, None, result.stderr
+            return False, None, result.stderr.decode('utf-8', errors='replace')
     
     except Exception as e:
         return False, None, str(e)

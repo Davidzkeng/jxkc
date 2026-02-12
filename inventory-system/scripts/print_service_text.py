@@ -250,13 +250,16 @@ def cups_print_text(printer_name, content):
         else:
             cmd = ['lp', '-d', printer_name, '-o', 'raw', '-o', 'media=24x14cm', temp_file]
         
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
         os.unlink(temp_file)
         
+        stdout_text = result.stdout.decode('utf-8', errors='replace').strip() if result.stdout else ''
+        stderr_text = result.stderr.decode('utf-8', errors='replace').strip() if result.stderr else ''
+        
         if result.returncode == 0:
-            return True, result.stdout.strip(), None
+            return True, stdout_text, None
         else:
-            return False, None, result.stderr
+            return False, None, stderr_text
     
     except Exception as e:
         return False, None, str(e)

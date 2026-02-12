@@ -307,14 +307,14 @@ def cups_print_pdf(printer_name, html_content):
                '--margin-top', '0', '--margin-bottom', '0', '--margin-left', '0', '--margin-right', '0',
                html_file, pdf_file]
         
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
         
         # 删除HTML文件
         os.unlink(html_file)
         
         if result.returncode != 0:
-            # 如果wkhtmltopdf失败，尝试使用lpr直接打印HTML
-            print(f"wkhtmltopdf失败，尝试直接打印HTML: {result.stderr}")
+            stderr_text = result.stderr.decode('utf-8', errors='replace')
+            print(f"wkhtmltopdf失败，尝试直接打印HTML: {stderr_text}")
             cmd = [
                 'lpr',
                 '-P', printer_name,
@@ -322,26 +322,26 @@ def cups_print_pdf(printer_name, html_content):
                 '-o', 'media=22x14cm',
                 html_file
             ]
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
             os.unlink(html_file)
             
             if result.returncode == 0:
                 return True, "html-print", None
             else:
-                return False, None, result.stderr
+                return False, None, result.stderr.decode('utf-8', errors='replace')
         
         # 打印PDF
         cmd = ['lp', '-d', printer_name, pdf_file]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=30)
         
         # 删除PDF文件
         os.unlink(pdf_file)
         
         if result.returncode == 0:
-            job_id = result.stdout.strip()
+            job_id = result.stdout.decode('utf-8', errors='replace').strip()
             return True, job_id, None
         else:
-            return False, None, result.stderr
+            return False, None, result.stderr.decode('utf-8', errors='replace')
     
     except subprocess.TimeoutExpired:
         return False, None, "打印超时"

@@ -42,8 +42,8 @@ def find_font():
     # 搜索所有可用字体
     try:
         result = subprocess.run(['fc-list', ':lang=zh', '-f', '%{file}\\n'],
-                              capture_output=True, text=True, shell=True)
-        fonts = result.stdout.strip().split('\\n')
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        fonts = result.stdout.decode('utf-8', errors='replace').strip().split('\\n')
         for font in fonts:
             if font and os.path.exists(font.strip()):
                 print(f"找到字体(fc-list): {font.strip()}")
@@ -328,13 +328,13 @@ def cups_print_image(printer_name, img):
             img_file
         ]
         
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=60)
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=60)
         os.unlink(img_file)
         
         if result.returncode == 0:
-            return True, result.stdout.strip(), None
+            return True, result.stdout.decode('utf-8', errors='replace').strip(), None
         else:
-            return False, None, result.stderr
+            return False, None, result.stderr.decode('utf-8', errors='replace')
     
     except Exception as e:
         return False, None, str(e)
