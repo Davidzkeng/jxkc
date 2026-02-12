@@ -159,6 +159,11 @@ def create_print_content(job):
         
         total_amount += amount
     
+    # 如果商品数据少于6行，补充空行至6行
+    remaining_lines = 6 - total_items
+    for i in range(max(0, remaining_lines)):
+        lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('', 12)}{pad_text('', 14)}{pad_text('', 16)}|")
+    
     lines.append("-" * PAGE_WIDTH)
     lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('合计', 12, 'center')}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 16, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
