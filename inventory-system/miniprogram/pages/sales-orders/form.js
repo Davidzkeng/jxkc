@@ -259,39 +259,58 @@ Page({
   calculateTotalAmount() {
     const selectedProducts = this.data.selectedProducts;
     let totalAmount = 0;
-    
+
     selectedProducts.forEach(product => {
       const price = product.selectedUnit?.price || product.price || 0;
       totalAmount += price * (product.quantity || 0);
     });
-    
+
     this.setData({
-      totalAmount: totalAmount.toFixed(2)
+      totalAmount: parseFloat(totalAmount.toFixed(2))
     });
   },
 
-  onPriceChange(e) {
-    // 价格修改功能保留，但会覆盖单位的单价
+  onPriceInput(e) {
+    // 价格输入时只更新显示值，不进行计算
     const index = e.currentTarget.dataset.index;
-    const price = parseFloat(e.detail.value) || 0;
+    const value = e.detail.value;
     const selectedProducts = this.data.selectedProducts;
-    
+
+    const updatedProducts = [...selectedProducts];
+    updatedProducts[index] = {
+      ...updatedProducts[index],
+      inputPrice: value
+    };
+
+    this.setData({
+      selectedProducts: updatedProducts
+    });
+  },
+
+  onPriceBlur(e) {
+    // 失去焦点时进行计算
+    const index = e.currentTarget.dataset.index;
+    const value = e.detail.value;
+    const price = parseFloat(value) || 0;
+    const selectedProducts = this.data.selectedProducts;
+
     const updatedProducts = [...selectedProducts];
     const product = updatedProducts[index];
-    
+
     updatedProducts[index] = {
       ...updatedProducts[index],
       selectedUnit: {
         ...updatedProducts[index].selectedUnit,
-        price: price
+        price: parseFloat(price.toFixed(2))
       },
-      subtotal: price * (product.quantity || 1)
+      inputPrice: null, // 清空输入值，使用计算后的price
+      subtotal: parseFloat((price * (product.quantity || 1)).toFixed(2))
     };
-    
+
     this.setData({
       selectedProducts: updatedProducts
     });
-    
+
     this.calculateTotalAmount();
   },
 

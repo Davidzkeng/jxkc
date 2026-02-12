@@ -136,9 +136,10 @@
                 <input 
                   class="price-input" 
                   type="digit" 
-                  placeholder="0.00" 
-                  value="{{item.selectedUnit.price}}" 
-                  bindinput="onPriceChange" 
+                  placeholder="0.00"
+                  value="{{item.inputPrice || item.selectedUnit.price}}"
+                  bindinput="onPriceInput" 
+                  bindblur="onPriceBlur"
                   data-index="{{index}}"
                 />
               </view>
