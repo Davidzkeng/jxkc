@@ -133,8 +133,8 @@ def create_print_content(job):
     lines.append(f"客户名称: {customer.get('name', '')}")
     lines.append(f"联系电话: {customer.get('phone', '')}")
     lines.append("-" * PAGE_WIDTH)
-    # 表头带竖线
-    lines.append(f"|{pad_text('序号', 6)}|{pad_text('商品名称', 16)}|{pad_text('规格', 10)}|{pad_text('单位', 12)}|{pad_text('数量', 12)}|{pad_text('单价(元)', 14)}|{pad_text('金额(元)', 12)}|")
+    # 表头 - 只保留左右竖线
+    lines.append(f"|{pad_text('序号', 6, 'center')}{pad_text('商品名称', 22, 'center')}{pad_text('单位', 12, 'center')}{pad_text('数量', 12, 'center')}{pad_text('单价(元)', 14, 'center')}{pad_text('金额(元)', 16, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
     
     # ========== 商品明细 ==========
@@ -143,25 +143,24 @@ def create_print_content(job):
     
     for idx, item in enumerate(products, 1):
         product = item.get("product", {})
-        # 从productUnit获取单位名称
+        # 从productUnit获取单位名称（优先），兼容直接放在item上的unitName
         product_unit = item.get("productUnit", {})
-        unit = product_unit.get('unitName', '') or product.get('unitName', '') or product.get('unit', '') or '个'
+        unit = product_unit.get('unitName', '') or item.get('unitName', '') or product.get('unitName', '') or product.get('unit', '') or '个'
         unit = unit[:4]
-        
+
         name = product.get('name', '')
-        spec = product.get('spec', '')
         qty = item.get('quantity', 0)
         price = float(item.get('price', 0))
         amount = float(item.get('totalAmount', 0))
-        
-        # 使用pad_text处理中英文混合对齐，带竖线
-        line = f"|{pad_text(idx, 6)}|{pad_text(name, 16)}|{pad_text(spec, 10)}|{pad_text(unit, 12)}|{pad_text(qty, 12)}|{pad_text(f'{price:.2f}', 14)}|{pad_text(f'{amount:.2f}', 12)}|"
+
+        # 使用pad_text处理中英文混合对齐，只保留左右竖线
+        line = f"|{pad_text(idx, 6, 'center')}{pad_text(name, 22, 'center')}{pad_text(unit, 12, 'center')}{pad_text(qty, 12, 'center')}{pad_text(f'{price:.2f}', 14, 'center')}{pad_text(f'{amount:.2f}', 16, 'center')}|"
         lines.append(line)
         
         total_amount += amount
     
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"|{pad_text('', 6)}|{pad_text('', 16)}|{pad_text('', 10)}|{pad_text('', 12)}|{pad_text('合计', 12)}|{pad_text(f'{total_items}种', 14)}|{pad_text(f'{total_amount:.2f}', 12)}|")
+    lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('合计', 12, 'center')}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 16, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
     lines.append("")
     lines.append(f"客户签名: ________________")

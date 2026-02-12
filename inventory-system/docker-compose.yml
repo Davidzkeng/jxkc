@@ -16,7 +16,7 @@ services:
       - DATABASE_URL=file:/app/data/dev.db
     volumes:
       # Persist SQLite database
-      - inventory-data:/app/data
+      - /data/jxkc:/app/data
       # Optional: Mount for hot reload in development
       # - ./src:/app/src
     networks:
@@ -27,10 +27,6 @@ services:
       timeout: 3s
       retries: 3
       start_period: 5s
-
-volumes:
-  inventory-data:
-    driver: local
 
 networks:
   inventory-network:
