@@ -8,6 +8,7 @@ Page({
     units: [],
     showAddForm: false,
     unitName: '',
+    specification: '',
     conversionRate: '1',
     unitPrice: '',
     isDefault: false,
@@ -50,10 +51,15 @@ Page({
     this.setData({
       showAddForm: !this.data.showAddForm,
       unitName: '',
+      specification: '',
       conversionRate: '1',
       unitPrice: '',
       isDefault: this.data.units.length === 0
     });
+  },
+
+  onSpecificationChange(e) {
+    this.setData({ specification: e.detail.value });
   },
 
   onUnitNameChange(e) {
@@ -93,6 +99,7 @@ Page({
     const data = {
       productId: this.data.productId,
       unitName: this.data.unitName,
+      specification: this.data.specification,
       conversionRate: conversionRate,
       price: unitPrice,
       isDefault: this.data.isDefault

@@ -50,6 +50,7 @@ model ProductUnit {
   productId       Int
   product         Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
   unitName        String    // 单位名称（斤、件、箱、盒等）
+  specification   String?   // 规格（如：500g/袋、10个/箱等）
   conversionRate  Float     @default(1)  // 转换系数（相对于基本单位）
   price           Decimal   @default(0.00)  // 该单位下的单价
   isDefault       Boolean   @default(false)  // 是否默认单位

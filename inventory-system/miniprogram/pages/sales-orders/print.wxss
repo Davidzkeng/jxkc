@@ -86,12 +86,13 @@
 }
 
 /* 表格列宽 - 使用固定 rpx 宽度确保对齐 */
-.th-index { width: 100rpx; flex-shrink: 0; }
-.th-name { width: 200rpx; flex-shrink: 0; }
-.th-qty { width: 100rpx; flex-shrink: 0; }
-.th-unit { width: 80rpx; flex-shrink: 0; }
-.th-price { width: 120rpx; flex-shrink: 0; }
-.th-amount { width: 140rpx; flex-shrink: 0; }
+.th-index { width: 80rpx; flex-shrink: 0; }
+.th-name { width: 160rpx; flex-shrink: 0; }
+.th-spec { width: 120rpx; flex-shrink: 0; }
+.th-qty { width: 80rpx; flex-shrink: 0; }
+.th-unit { width: 70rpx; flex-shrink: 0; }
+.th-price { width: 100rpx; flex-shrink: 0; }
+.th-amount { width: 120rpx; flex-shrink: 0; }
 .th-remark { flex: 1; min-width: 60rpx; }
 
 .table-body {
@@ -130,35 +131,42 @@
   border-right: none;
 }
 
-.td-index { 
-  width: 100rpx; 
+.td-index {
+  width: 80rpx;
   flex-shrink: 0;
 }
-.td-name { 
-  width: 200rpx; 
+.td-name {
+  width: 160rpx;
   flex-shrink: 0;
   text-align: left;
   justify-content: flex-start;
   padding-left: 10rpx;
 }
-.td-qty { 
-  width: 100rpx; 
+.td-spec {
+  width: 120rpx;
+  flex-shrink: 0;
+  text-align: left;
+  justify-content: flex-start;
+  padding-left: 10rpx;
+}
+.td-qty {
+  width: 80rpx;
   flex-shrink: 0;
 }
-.td-unit { 
-  width: 80rpx; 
+.td-unit {
+  width: 70rpx;
   flex-shrink: 0;
 }
-.td-price { 
-  width: 120rpx; 
+.td-price {
+  width: 100rpx;
   flex-shrink: 0;
 }
-.td-amount { 
-  width: 140rpx; 
+.td-amount {
+  width: 120rpx;
   flex-shrink: 0;
 }
-.td-remark { 
-  flex: 1; 
+.td-remark {
+  flex: 1;
   min-width: 60rpx;
 }
 

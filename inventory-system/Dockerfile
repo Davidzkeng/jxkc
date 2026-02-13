@@ -65,5 +65,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD node -e "require('http').get('http://localhost:' + (process.env.PORT || '3001') + '/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Run Prisma migrations and start server
+# 注意：生产环境只使用 migrate deploy，不使用 db push --accept-data-loss
+# db push 只在开发环境使用，生产环境数据迁移必须通过 migration 文件
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db push --accept-data-loss && npm run server"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npm run server"]

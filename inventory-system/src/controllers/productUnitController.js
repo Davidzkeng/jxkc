@@ -33,8 +33,8 @@ exports.getProductUnitById = async (req, res) => {
 // 创建商品单位
 exports.createProductUnit = async (req, res) => {
   try {
-    const { productId, unitName, conversionRate, price, isDefault } = req.body;
-    
+    const { productId, unitName, specification, conversionRate, price, isDefault } = req.body;
+
     // 如果设为默认单位，需要取消该商品的其他默认单位
     if (isDefault) {
       await prisma.productUnit.updateMany({
@@ -42,11 +42,12 @@ exports.createProductUnit = async (req, res) => {
         data: { isDefault: false }
       });
     }
-    
+
     const unit = await prisma.productUnit.create({
       data: {
         productId: parseInt(productId),
         unitName,
+        specification,
         conversionRate: parseFloat(conversionRate) || 1,
         price: parseFloat(price) || 0,
         isDefault: isDefault || false
@@ -62,16 +63,16 @@ exports.createProductUnit = async (req, res) => {
 exports.updateProductUnit = async (req, res) => {
   try {
     const { id } = req.params;
-    const { unitName, conversionRate, price, isDefault } = req.body;
-    
+    const { unitName, specification, conversionRate, price, isDefault } = req.body;
+
     const unit = await prisma.productUnit.findUnique({
       where: { id: parseInt(id) }
     });
-    
+
     if (!unit) {
       return res.status(404).json({ error: '商品单位不存在' });
     }
-    
+
     // 如果设为默认单位，需要取消该商品的其他默认单位
     if (isDefault && !unit.isDefault) {
       await prisma.productUnit.updateMany({
@@ -79,11 +80,12 @@ exports.updateProductUnit = async (req, res) => {
         data: { isDefault: false }
       });
     }
-    
+
     const updated = await prisma.productUnit.update({
       where: { id: parseInt(id) },
       data: {
         unitName,
+        specification,
         conversionRate: parseFloat(conversionRate) || 1,
         price: parseFloat(price) || 0,
         isDefault: isDefault || false

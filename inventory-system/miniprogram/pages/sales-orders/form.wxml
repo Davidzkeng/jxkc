@@ -137,7 +137,7 @@
                   class="price-input" 
                   type="digit" 
                   placeholder="0.00"
-                  value="{{item.inputPrice || item.selectedUnit.price}}"
+                  value="{{item.inputPrice !== null && item.inputPrice !== '' && item.inputPrice !== undefined && item.inputPrice !== '__EMPTY__' ? item.inputPrice : (item.inputPrice === '__EMPTY__' ? '' : item.selectedUnit.price || 0)}}"
                   bindinput="onPriceInput" 
                   bindblur="onPriceBlur"
                   data-index="{{index}}"

@@ -36,6 +36,7 @@ exports.getAllSalesOrders = async (req, res) => {
         code: item.product.code,
         productUnitId: item.productUnitId,
         unitName: item.productUnit?.unitName || '斤',
+        specification: item.productUnit?.specification || '',
         quantity: item.quantity,
         price: item.price,
         totalAmount: item.totalAmount
@@ -87,6 +88,7 @@ exports.getSalesOrderById = async (req, res) => {
         code: item.product.code,
         productUnitId: item.productUnitId,
         unitName: item.productUnit?.unitName || '斤',
+        specification: item.productUnit?.specification || '',
         quantity: item.quantity,
         price: item.price,
         totalAmount: item.totalAmount
@@ -215,6 +217,7 @@ exports.createSalesOrder = async (req, res) => {
         code: item.product.code,
         productUnitId: item.productUnitId,
         unitName: item.productUnit?.unitName || '斤',
+        specification: item.productUnit?.specification || '',
         quantity: item.quantity,
         price: item.price,
         totalAmount: item.totalAmount
@@ -335,6 +338,7 @@ exports.voidSalesOrder = async (req, res) => {
         code: item.product.code,
         productUnitId: item.productUnitId,
         unitName: item.productUnit?.unitName || '斤',
+        specification: item.productUnit?.specification || '',
         quantity: item.quantity,
         price: item.price,
         totalAmount: item.totalAmount

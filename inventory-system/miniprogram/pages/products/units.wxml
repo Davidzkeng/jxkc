@@ -42,6 +42,12 @@
       </view>
 
       <view class="form-item">
+        <text class="form-label">规格</text>
+        <input class="form-input" placeholder="如：500g/袋、10个/箱" value="{{specification}}" bindinput="onSpecificationChange" />
+        <text class="hint">描述该单位的具体规格</text>
+      </view>
+
+      <view class="form-item">
         <text class="form-label">转换系数</text>
         <input class="form-input" type="digit" placeholder="相对于基本单位（斤）的系数" value="{{conversionRate}}" bindinput="onConversionRateChange" />
         <text class="hint">例如：1件=10斤，则填写10</text>

@@ -277,9 +277,10 @@ Page({
     const selectedProducts = this.data.selectedProducts;
 
     const updatedProducts = [...selectedProducts];
+    // 使用特殊标记 '__EMPTY__' 表示用户主动清空，区别于初始的 null/undefined
     updatedProducts[index] = {
       ...updatedProducts[index],
-      inputPrice: value
+      inputPrice: value === '' ? '__EMPTY__' : value
     };
 
     this.setData({
@@ -291,11 +292,20 @@ Page({
     // 失去焦点时进行计算
     const index = e.currentTarget.dataset.index;
     const value = e.detail.value;
-    const price = parseFloat(value) || 0;
     const selectedProducts = this.data.selectedProducts;
 
     const updatedProducts = [...selectedProducts];
     const product = updatedProducts[index];
+
+    // 如果输入为空，保持为空，不自动填充默认价格
+    let price;
+    let inputPrice = null;
+    if (value === '' || value === null || value === undefined) {
+      price = 0;
+      inputPrice = '__EMPTY__'; // 保持特殊标记，这样输入框显示为空
+    } else {
+      price = parseFloat(value) || 0;
+    }
 
     updatedProducts[index] = {
       ...updatedProducts[index],
@@ -303,7 +313,7 @@ Page({
         ...updatedProducts[index].selectedUnit,
         price: parseFloat(price.toFixed(2))
       },
-      inputPrice: null, // 清空输入值，使用计算后的price
+      inputPrice: inputPrice, // 如果是空输入，保持特殊标记
       subtotal: parseFloat((price * (product.quantity || 1)).toFixed(2))
     };
 

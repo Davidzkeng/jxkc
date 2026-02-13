@@ -113,7 +113,7 @@ def create_print_content(job):
     lines = []
     
     # ========== 标题区域 ==========
-    lines.append("                                  销 售 单 据")
+    lines.append("                                  利 发 副 食")
     lines.append("-" * PAGE_WIDTH)
     
     # ========== 订单信息 ==========
@@ -172,7 +172,7 @@ def create_print_content(job):
     lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('合计', 12, 'center')}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 22, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
     lines.append("")
-    lines.append(f"客户签名: ________________")
+    lines.append(f"{left_text('服务电话: 15820159623', 60)}客户签名: ________________")
     lines.append("")
     lines.append("")
 
