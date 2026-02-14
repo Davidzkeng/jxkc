@@ -37,6 +37,11 @@ app.use('/api/out-records', outRecordRoutes);
 app.use('/api/sales-orders', salesOrderRoutes);
 app.use('/api/print-jobs', printJobRoutes);
 
+// 处理所有 API 路由的 404 错误
+app.all('/api/*path', (req, res) => {
+  res.status(404).json({ error: 'API 接口不存在' });
+});
+
 // 健康检查端点
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: '进销库存系统API服务运行正常' });

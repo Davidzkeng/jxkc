@@ -39,18 +39,61 @@
 
 .search-input-wrapper {
   margin-bottom: 16rpx;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
-  width: 100%;
+  flex: 1;
   height: 72rpx;
   line-height: 72rpx;
   font-size: 28rpx;
   color: #333;
   background: #f5f5f5;
   border-radius: 8rpx;
-  padding: 0 20rpx;
+  padding: 0 80rpx 0 20rpx;
   box-sizing: border-box;
+}
+
+.refresh-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 72rpx;
+  width: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e6f7ff;
+  border-radius: 0 8rpx 8rpx 0;
+}
+
+.refresh-btn:active {
+  background: #bae7ff;
+}
+
+.refresh-icon {
+  font-size: 32rpx;
+}
+
+.quick-add-btn {
+  margin-top: 16rpx;
+  padding: 16rpx 32rpx;
+  background: #f6ffed;
+  border: 2rpx dashed #52c41a;
+  border-radius: 8rpx;
+  text-align: center;
+}
+
+.quick-add-btn:active {
+  background: #d9f7be;
+}
+
+.quick-add-text {
+  font-size: 28rpx;
+  color: #52c41a;
+  font-weight: 500;
 }
 
 .selected-item {
@@ -341,9 +384,36 @@
   box-sizing: border-box;
 }
 
-/* 提交按钮样式 */
+/* 按钮组样式 */
+.btn-group {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 32rpx;
+}
+
+.save-btn {
+  flex: 1;
+  height: 88rpx;
+  line-height: 88rpx;
+  background: #fff;
+  color: #1890ff;
+  font-size: 32rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid #1890ff;
+}
+
+.save-btn:active {
+  background: #e6f7ff;
+}
+
+.save-btn[disabled] {
+  background: #f5f5f5;
+  color: #d9d9d9;
+  border-color: #d9d9d9;
+}
+
 .submit-btn {
-  width: 100%;
+  flex: 1;
   height: 88rpx;
   line-height: 88rpx;
   background: #1890ff;
@@ -351,7 +421,6 @@
   font-size: 32rpx;
   border-radius: 16rpx;
   border: none;
-  margin-top: 32rpx;
 }
 
 .submit-btn:active {

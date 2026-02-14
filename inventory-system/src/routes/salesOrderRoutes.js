@@ -14,6 +14,9 @@ router.post('/', salesOrderController.createSalesOrder);
 // 作废销售单
 router.post('/:id/void', salesOrderController.voidSalesOrder);
 
+// 更新销售单（仅草稿状态）
+router.put('/:id', salesOrderController.updateSalesOrder);
+
 // 删除销售单
 router.delete('/:id', salesOrderController.deleteSalesOrder);
 

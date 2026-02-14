@@ -43,8 +43,8 @@
             </view>
             <view class="product-details">
               <text class="product-quantity">数量: {{item.quantity % 1 === 0 ? item.quantity : item.quantity.toFixed(1)}}{{item.unitName}}</text>
-              <text class="product-price">单价: ¥{{item.price}}</text>
-              <text class="product-total">小计: ¥{{item.totalAmount}}</text>
+              <text class="product-price">单价: ¥{{item.price || '0.00'}}</text>
+              <text class="product-total">小计: ¥{{item.totalAmount || '0.00'}}</text>
             </view>
           </view>
         </view>
@@ -67,10 +67,13 @@
     </view>
 
     <view class="actions">
-      <button wx:if="{{order.status !== '已作废'}}" class="action-btn void-btn" bindtap="voidOrder">
+      <button wx:if="{{order.status === '草稿'}}" class="action-btn edit-btn" bindtap="editOrder">
+        编辑
+      </button>
+      <button wx:if="{{order.status !== '已作废' && order.status !== '草稿'}}" class="action-btn void-btn" bindtap="voidOrder">
         作废
       </button>
-      <button class="action-btn print-btn" bindtap="printOrder">
+      <button wx:if="{{order.status !== '草稿'}}" class="action-btn print-btn" bindtap="printOrder">
         <text class="btn-icon">🖨️</text>
         <text class="btn-text">打印</text>
       </button>

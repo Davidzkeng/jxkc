@@ -4,10 +4,13 @@ const prisma = require('../server/prisma');
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await prisma.product.findMany({
-      include: { 
+      include: {
         category: true,
         supplier: true,
         productUnits: true
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     });
     res.json(products);

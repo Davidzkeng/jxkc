@@ -113,7 +113,7 @@ def create_print_content(job):
     lines = []
     
     # ========== 标题区域 ==========
-    lines.append("                                  利 发 副 食")
+    lines.append("                                           利 发 副 食")
     lines.append("-" * PAGE_WIDTH)
     
     # ========== 订单信息 ==========
@@ -137,20 +137,23 @@ def create_print_content(job):
     lines.append(f"|联系电话: {customer.get('phone', ''):<78}|")
     lines.append("-" * PAGE_WIDTH)
 
-    # 表头 - 只保留左右竖线
-    lines.append(f"|{pad_text('序号', 6, 'center')}{pad_text('商品名称', 22, 'center')}{pad_text('单位', 12, 'center')}{pad_text('数量', 12, 'center')}{pad_text('单价(元)', 14, 'center')}{pad_text('金额(元)', 22, 'center')}|")
+    # 表头 - 只保留左右竖线 (序号6+名称18+单位8+规格10+数量8+单价10+金额18=78)
+    lines.append(f"|{pad_text('序号', 6, 'center')}{pad_text('商品名称', 22, 'center')}{pad_text('单位', 8, 'center')}{pad_text('规格', 10, 'center')}{pad_text('数量', 10, 'center')}{pad_text('单价', 14, 'center')}{pad_text('金额', 18, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
-    
+
     # ========== 商品明细 ==========
     total_items = len(products)  # 商品种类数
     total_amount = 0.0
-    
+
     for idx, item in enumerate(products, 1):
         product = item.get("product", {})
-        # 从productUnit获取单位名称（优先），兼容直接放在item上的unitName
+        # 从productUnit获取单位名称和规格（优先）
         product_unit = item.get("productUnit", {})
         unit = product_unit.get('unitName', '') or item.get('unitName', '') or product.get('unitName', '') or product.get('unit', '') or '个'
-        unit = unit[:4]
+        unit = unit[:3]
+        # 获取规格
+        specification = product_unit.get('specification', '') or product.get('specification', '') or ''
+        specification = specification[:8]
 
         name = product.get('name', '')
         qty = item.get('quantity', 0)
@@ -158,18 +161,18 @@ def create_print_content(job):
         amount = float(item.get('totalAmount', 0))
 
         # 使用pad_text处理中英文混合对齐，只保留左右竖线
-        line = f"|{pad_text(idx, 6, 'center')}{pad_text(name, 22, 'center')}{pad_text(unit, 12, 'center')}{pad_text(qty, 12, 'center')}{pad_text(f'{price:.2f}', 14, 'center')}{pad_text(f'{amount:.2f}', 22, 'center')}|"
+        line = f"|{pad_text(idx, 6, 'center')}{pad_text(name, 22, 'center')}{pad_text(unit, 8, 'center')}{pad_text(specification, 10, 'center')}{pad_text(qty, 10, 'center')}{pad_text(f'{price:.2f}', 14, 'center')}{pad_text(f'{amount:.2f}', 18, 'center')}|"
         lines.append(line)
-        
+
         total_amount += amount
-    
+
     # 如果商品数据少于12行，补充空行至12行
     remaining_lines = 10 - total_items
     for i in range(max(0, remaining_lines)):
-        lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('', 12)}{pad_text('', 14)}{pad_text('', 22)}|")
-    
+        lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 8)}{pad_text('', 10)}{pad_text('', 10)}{pad_text('', 14)}{pad_text('', 18)}|")
+
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 12)}{pad_text('合计', 12, 'center')}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 22, 'center')}|")
+    lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 8)}{pad_text('', 10)}{pad_text('合计', 10, 'center')}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 18, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
     lines.append("")
     lines.append(f"{left_text('服务电话: 15820159623', 60)}客户签名: ________________")

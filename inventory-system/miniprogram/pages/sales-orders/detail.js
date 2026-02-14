@@ -4,12 +4,21 @@ const util = require('../../utils/util.js');
 Page({
   data: {
     order: null,
+    orderId: null,
     loading: false
   },
 
   onLoad(options) {
     if (options.id) {
+      this.setData({ orderId: options.id });
       this.loadOrderDetail(options.id);
+    }
+  },
+
+  onShow() {
+    // 页面显示时刷新数据（从编辑页返回时）
+    if (this.data.orderId) {
+      this.loadOrderDetail(this.data.orderId);
     }
   },
 
@@ -64,5 +73,24 @@ Page({
 
   goBack() {
     wx.navigateBack();
+  },
+
+  // 编辑草稿销售单
+  editOrder() {
+    const order = this.data.order;
+    if (!order) {
+      util.showError('销售单信息未加载');
+      return;
+    }
+
+    if (order.status !== '草稿') {
+      util.showError('只有草稿状态可以编辑');
+      return;
+    }
+
+    // 跳转到编辑页面
+    wx.navigateTo({
+      url: `/pages/sales-orders/form?id=${order.id}&mode=edit`
+    });
   }
 });

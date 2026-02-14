@@ -62,6 +62,9 @@
             value="{{productSearchKey}}" 
             bindinput="onProductSearchInput" 
           />
+          <view class="refresh-btn" bindtap="refreshProducts">
+            <text class="refresh-icon">🔄</text>
+          </view>
         </view>
         <view 
           class="selected-item placeholder" 
@@ -84,6 +87,9 @@
             </view>
             <view class="result-item empty" wx:if="{{filteredProducts.length === 0}}">
               <text>暂无商品</text>
+              <view class="quick-add-btn" bindtap="quickAddProduct">
+                <text class="quick-add-text">+ 快速添加商品</text>
+              </view>
             </view>
           </scroll-view>
         </view>
@@ -184,8 +190,13 @@
       ></textarea>
     </view>
 
-    <button class="submit-btn" bindtap="submit" disabled="{{submitLoading}}">
-      {{submitLoading ? '提交中...' : '生成销售单'}}
-    </button>
+    <view class="btn-group">
+      <button class="save-btn" bindtap="saveDraft" disabled="{{submitLoading}}">
+        {{submitLoading ? '保存中...' : '保存草稿'}}
+      </button>
+      <button class="submit-btn" bindtap="submit" disabled="{{submitLoading}}">
+        {{submitLoading ? '提交中...' : '生成销售单'}}
+      </button>
+    </view>
   </view>
 </view>

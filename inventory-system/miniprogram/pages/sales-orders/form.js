@@ -6,11 +6,11 @@ Page({
     // 原始数据
     products: [],
     customers: [],
-    
+
     // 选中的数据
     selectedCustomer: null,
     selectedProducts: [],
-    
+
     // 搜索相关
     productSearchKey: '',
     customerSearchKey: '',
@@ -18,16 +18,82 @@ Page({
     filteredCustomers: [],
     showProductList: false,
     showCustomerList: false,
-    
+
     // 表单数据
     remark: '',
     totalAmount: '0.00',
     loading: false,
-    submitLoading: false
+    submitLoading: false,
+
+    // 编辑模式
+    isEditMode: false,
+    editOrderId: null
   },
 
-  onLoad() {
+  onLoad(options) {
     this.loadData();
+
+    // 如果是编辑模式，加载销售单数据
+    if (options.id && options.mode === 'edit') {
+      this.setData({
+        isEditMode: true,
+        editOrderId: parseInt(options.id)
+      });
+      this.loadOrderData(parseInt(options.id));
+    }
+  },
+
+  // 加载销售单数据（编辑模式）
+  loadOrderData(orderId) {
+    this.setData({ loading: true });
+    Promise.all([api.getSalesOrderById(orderId), api.getProducts()])
+      .then(([res, productsRes]) => {
+        if (res.status !== '草稿') {
+          util.showError('只有草稿状态可以编辑');
+          wx.navigateBack();
+          return;
+        }
+
+        const products = Array.isArray(productsRes) ? productsRes : [];
+
+        // 设置客户
+        const customer = this.data.customers.find(c => c.name === res.customerName);
+
+        // 设置商品 - 从商品列表中获取完整信息
+        const selectedProducts = res.products.map(p => {
+          // 从商品列表中找到对应的商品
+          const product = products.find(prod => prod.id === p.id) || {};
+          
+          return {
+            id: p.id,
+            name: p.name,
+            code: p.code,
+            price: p.price,
+            quantity: p.quantity,
+            selectedUnit: {
+              id: p.productUnitId,
+              unitName: p.unitName,
+              price: p.price
+            },
+            productUnits: product.productUnits || [],
+            stock: product.stock || 0
+          };
+        });
+
+        this.setData({
+          selectedCustomer: customer || { name: res.customerName },
+          selectedProducts: selectedProducts,
+          remark: res.remark || '',
+          loading: false
+        });
+
+        this.calculateTotalAmount();
+      })
+      .catch(err => {
+        console.error('加载销售单失败', err);
+        util.showError('加载失败');
+        this.setData({ loading: false });
+      });
   },
 
   loadData() {
@@ -36,7 +102,7 @@ Page({
       .then(([productsRes, customersRes]) => {
         const products = Array.isArray(productsRes) ? productsRes : [];
         const customers = Array.isArray(customersRes) ? customersRes : [];
-        
+
         this.setData({
           products: products,
           customers: customers,
@@ -50,6 +116,30 @@ Page({
         util.showError('加载失败');
         this.setData({ loading: false });
       });
+  },
+
+  // 刷新商品列表
+  refreshProducts() {
+    this.setData({ productSearchKey: '' });
+    this.loadData();
+    util.showSuccess('刷新成功');
+  },
+
+  // 快速添加商品
+  quickAddProduct() {
+    wx.showModal({
+      title: '快速添加商品',
+      content: '是否跳转到商品管理页面添加新商品？',
+      confirmText: '去添加',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          wx.navigateTo({
+            url: '/pages/products/form'
+          });
+        }
+      }
+    });
   },
 
   // 客户搜索
@@ -330,6 +420,59 @@ Page({
     });
   },
 
+  // 保存草稿
+  saveDraft() {
+    if (!this.data.selectedCustomer) {
+      util.showError('请选择客户');
+      return;
+    }
+
+    if (this.data.selectedProducts.length === 0) {
+      util.showError('请选择商品');
+      return;
+    }
+
+    // 计算总金额
+    const calculatedTotalAmount = this.data.selectedProducts.reduce((sum, product) => {
+      const price = product.selectedUnit?.price || product.price || 0;
+      return sum + price * (product.quantity || 0);
+    }, 0);
+
+    const data = {
+      customerId: this.data.selectedCustomer.id,
+      products: this.data.selectedProducts.map(p => ({
+        productId: p.id,
+        productUnitId: p.selectedUnit?.id || null,
+        quantity: p.quantity,
+        price: p.selectedUnit?.price || p.price || 0,
+        totalAmount: (p.selectedUnit?.price || p.price || 0) * p.quantity
+      })),
+      totalAmount: calculatedTotalAmount,
+      remark: this.data.remark,
+      status: '草稿'
+    };
+
+    this.setData({ submitLoading: true });
+
+    // 根据模式选择创建或更新
+    const apiCall = this.data.isEditMode
+      ? api.updateSalesOrder(this.data.editOrderId, data)
+      : api.createSalesOrder(data);
+
+    apiCall
+      .then(() => {
+        util.showSuccess(this.data.isEditMode ? '草稿更新成功' : '草稿保存成功');
+        setTimeout(() => {
+          wx.navigateBack();
+        }, 1500);
+      })
+      .catch(err => {
+        console.error('保存草稿失败', err);
+        util.showError(err.data?.error || '保存失败');
+        this.setData({ submitLoading: false });
+      });
+  },
+
   submit() {
     if (!this.data.selectedCustomer) {
       util.showError('请选择客户');
@@ -357,17 +500,28 @@ Page({
         totalAmount: (p.selectedUnit?.price || p.price || 0) * p.quantity
       })),
       totalAmount: calculatedTotalAmount,
-      remark: this.data.remark
+      remark: this.data.remark,
+      status: '已完成'
     };
 
     this.setData({ submitLoading: true });
 
-    api.createSalesOrder(data)
-      .then(() => {
-        util.showSuccess('销售单创建成功');
+    // 根据模式选择创建或更新
+    const apiCall = this.data.isEditMode
+      ? api.updateSalesOrder(this.data.editOrderId, data)
+      : api.createSalesOrder(data);
+
+    apiCall
+      .then((res) => {
+        util.showSuccess(this.data.isEditMode ? '销售单更新成功' : '销售单创建成功');
+        // 获取销售单ID（创建模式返回新ID，编辑模式使用原ID）
+        const orderId = this.data.isEditMode ? this.data.editOrderId : (res.id || res.data?.id);
         setTimeout(() => {
-          wx.navigateBack();
-        }, 1500);
+          // 跳转到打印预览页面
+          wx.redirectTo({
+            url: `/pages/sales-orders/print?id=${orderId}`
+          });
+        }, 800);
       })
       .catch(err => {
         console.error('创建销售单失败', err);

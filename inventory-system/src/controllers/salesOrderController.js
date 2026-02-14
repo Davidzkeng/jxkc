@@ -104,7 +104,7 @@ exports.getSalesOrderById = async (req, res) => {
 // 创建销售单
 exports.createSalesOrder = async (req, res) => {
   try {
-    const { customerId, products, remark } = req.body;
+    const { customerId, products, remark, status } = req.body;
 
     // 生成销售单号
     const orderNumber = 'SO' + Date.now();
@@ -166,7 +166,7 @@ exports.createSalesOrder = async (req, res) => {
         customerId: parseInt(customerId),
         totalAmount: calculatedTotalAmount,
         remark: remark || '',
-        status: '已完成',
+        status: status || '已完成',
         products: {
           create: processedProducts.map(item => ({
             productId: item.productId,
@@ -212,6 +212,138 @@ exports.createSalesOrder = async (req, res) => {
       status: salesOrder.status,
       remark: salesOrder.remark,
       products: salesOrder.products.map(item => ({
+        id: item.product.id,
+        name: item.product.name,
+        code: item.product.code,
+        productUnitId: item.productUnitId,
+        unitName: item.productUnit?.unitName || '斤',
+        specification: item.productUnit?.specification || '',
+        quantity: item.quantity,
+        price: item.price,
+        totalAmount: item.totalAmount
+      }))
+    };
+
+    res.json(formattedOrder);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// 更新销售单（仅草稿状态）
+exports.updateSalesOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { customerId, products, remark, status } = req.body;
+
+    // 获取原销售单信息
+    const existingOrder = await prisma.salesOrder.findUnique({
+      where: { id: parseInt(id) },
+      include: { products: true }
+    });
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: '销售单不存在' });
+    }
+
+    if (existingOrder.status !== '草稿') {
+      return res.status(400).json({ error: '只有草稿状态的销售单可以编辑' });
+    }
+
+    // 删除原商品明细
+    await prisma.salesOrderProduct.deleteMany({
+      where: { salesOrderId: parseInt(id) }
+    });
+
+    // 处理新商品数据
+    const processedProducts = await Promise.all(products.map(async (item) => {
+      const productId = parseInt(item.productId);
+      const quantity = parseFloat(item.quantity) || 0;
+
+      let unitPrice = parseFloat(item.price);
+      let baseQuantity = quantity;
+
+      if (item.productUnitId) {
+        const unit = await prisma.productUnit.findUnique({
+          where: { id: parseInt(item.productUnitId) }
+        });
+        if (unit) {
+          baseQuantity = quantity * unit.conversionRate;
+          if (!unitPrice || isNaN(unitPrice)) {
+            unitPrice = parseFloat(unit.price);
+          }
+        }
+      }
+
+      if (!unitPrice || isNaN(unitPrice)) {
+        const defaultUnit = await prisma.productUnit.findFirst({
+          where: { productId, isDefault: true }
+        });
+        if (defaultUnit) {
+          unitPrice = parseFloat(defaultUnit.price);
+        } else {
+          unitPrice = 0;
+        }
+      }
+
+      const totalAmount = unitPrice * quantity;
+
+      return {
+        productId,
+        productUnitId: item.productUnitId ? parseInt(item.productUnitId) : null,
+        quantity,
+        baseQuantity,
+        price: unitPrice,
+        totalAmount
+      };
+    }));
+
+    // 计算总金额
+    const calculatedTotalAmount = processedProducts.reduce((sum, item) => {
+      return sum + item.totalAmount;
+    }, 0);
+
+    // 更新销售单
+    const updatedOrder = await prisma.salesOrder.update({
+      where: { id: parseInt(id) },
+      data: {
+        customerId: parseInt(customerId),
+        totalAmount: calculatedTotalAmount,
+        remark: remark || '',
+        status: status || '草稿',
+        products: {
+          create: processedProducts.map(item => ({
+            productId: item.productId,
+            productUnitId: item.productUnitId,
+            quantity: item.quantity,
+            baseQuantity: item.baseQuantity,
+            price: item.price,
+            totalAmount: item.totalAmount
+          }))
+        }
+      },
+      include: {
+        customer: true,
+        products: {
+          include: {
+            product: true,
+            productUnit: true
+          }
+        }
+      }
+    });
+
+    // 格式化返回数据
+    const formattedOrder = {
+      id: updatedOrder.id,
+      orderNumber: updatedOrder.orderNumber,
+      customerName: updatedOrder.customer.name,
+      customerContact: updatedOrder.customer.contact,
+      customerPhone: updatedOrder.customer.phone,
+      createdAt: updatedOrder.createdAt.toISOString().split('T')[0],
+      status: updatedOrder.status,
+      remark: updatedOrder.remark,
+      products: updatedOrder.products.map(item => ({
         id: item.product.id,
         name: item.product.name,
         code: item.product.code,

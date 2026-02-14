@@ -123,6 +123,7 @@ module.exports = {
   getSalesOrders: () => request({ url: '/sales-orders', method: 'GET' }),
   getSalesOrderById: (id) => request({ url: `/sales-orders/${id}`, method: 'GET' }),
   createSalesOrder: (data) => request({ url: '/sales-orders', method: 'POST', data }),
+  updateSalesOrder: (id, data) => request({ url: `/sales-orders/${id}`, method: 'PUT', data }),
   voidSalesOrder: (id) => request({ url: `/sales-orders/${id}/void`, method: 'POST' }),
   deleteSalesOrder: (id) => request({ url: `/sales-orders/${id}`, method: 'DELETE' }),
 
