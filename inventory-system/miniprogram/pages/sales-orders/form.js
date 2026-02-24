@@ -63,20 +63,35 @@ Page({
         const selectedProducts = res.products.map(p => {
           // 从商品列表中找到对应的商品
           const product = products.find(prod => prod.id === p.id) || {};
-          
+          const units = product.productUnits || [];
+
+          // 获取默认单位价格（价格始终显示默认单位的价格）
+          const defaultUnit = units.find(u => u.isDefault) || units[0];
+          const defaultPrice = parseFloat(defaultUnit?.price || product.price || 0);
+
+          // 找到当前选中的单位及其转换系数
+          const currentUnit = units.find(u => u.id === p.productUnitId);
+          const currentConversionRate = parseFloat(currentUnit?.conversionRate || 1);
+
+          // 小计 = 默认单位价格 × 数量 × 转换系数
+          const subtotal = defaultPrice * p.quantity * currentConversionRate;
+
           return {
             id: p.id,
             name: p.name,
             code: p.code,
             price: p.price,
             quantity: p.quantity,
+            units: units,
             selectedUnit: {
               id: p.productUnitId,
               unitName: p.unitName,
-              price: p.price
+              price: parseFloat(defaultPrice.toFixed(2)),
+              conversionRate: currentConversionRate
             },
-            productUnits: product.productUnits || [],
-            stock: product.stock || 0
+            productUnits: units,
+            stock: product.stock || 0,
+            subtotal: parseFloat(subtotal.toFixed(2))
           };
         });
 
@@ -215,33 +230,47 @@ Page({
   selectProduct(e) {
     const product = e.currentTarget.dataset.product;
     const selectedProducts = this.data.selectedProducts;
-    
+
     // 检查商品是否已经选中
     const existingIndex = selectedProducts.findIndex(p => p.id === product.id);
     if (existingIndex !== -1) {
       util.showError('该商品已添加');
       return;
     }
-    
+
     // 获取商品的单位列表，如果没有单位则使用默认
     const units = product.productUnits || [];
-    const defaultUnit = units.find(u => u.isDefault) || units[0] || { id: null, unitName: '斤', price: product.price };
-    
+    const defaultUnit = units.find(u => u.isDefault) || units[0];
+
+    // 获取默认单位价格（价格始终显示默认单位的价格）
+    const defaultPrice = parseFloat(defaultUnit?.price || product.price || 0);
+    const defaultConversionRate = parseFloat(defaultUnit?.conversionRate || 1);
+
+    // 如果没有单位，创建一个默认单位
+    const selectedUnit = defaultUnit || { id: null, unitName: '斤', price: defaultPrice, conversionRate: 1 };
+
+    // 小计 = 默认单位价格 × 数量 × 转换系数（默认单位转换系数为1）
+    const subtotal = defaultPrice * 1 * defaultConversionRate;
+
     // 添加商品到已选列表
     selectedProducts.push({
       ...product,
       units: units,
-      selectedUnit: defaultUnit,
+      selectedUnit: {
+        ...selectedUnit,
+        price: parseFloat(defaultPrice.toFixed(2)),
+        conversionRate: defaultConversionRate
+      },
       quantity: 1,
-      subtotal: defaultUnit.price * 1
+      subtotal: parseFloat(subtotal.toFixed(2))
     });
-    
+
     this.setData({
       selectedProducts: selectedProducts,
       showProductList: false,
       productSearchKey: ''
     });
-    
+
     this.calculateTotalAmount();
   },
 
@@ -253,18 +282,33 @@ Page({
     const product = selectedProducts[index];
     const units = product.units || [];
     const selectedUnit = units[unitIndex];
-    
+
+    // 获取默认单位的价格（价格始终显示默认单位的价格）
+    const defaultUnit = units.find(u => u.isDefault) || units[0];
+    const defaultPrice = parseFloat(defaultUnit?.price || product.price || 0);
+
+    // 获取当前单位的转换系数，用于计算小计
+    const selectedConversionRate = parseFloat(selectedUnit?.conversionRate || 1);
+
+    // 小计 = 默认单位价格 × 数量 × 转换系数
+    const quantity = product.quantity || 1;
+    const subtotal = defaultPrice * quantity * selectedConversionRate;
+
     const updatedProducts = [...selectedProducts];
     updatedProducts[index] = {
       ...updatedProducts[index],
-      selectedUnit: selectedUnit,
-      subtotal: (selectedUnit.price || 0) * (updatedProducts[index].quantity || 1)
+      selectedUnit: {
+        ...selectedUnit,
+        price: parseFloat(defaultPrice.toFixed(2)),
+        conversionRate: selectedConversionRate
+      },
+      subtotal: parseFloat(subtotal.toFixed(2))
     };
-    
+
     this.setData({
       selectedProducts: updatedProducts
     });
-    
+
     this.calculateTotalAmount();
   },
 
@@ -272,21 +316,25 @@ Page({
     const index = e.currentTarget.dataset.index;
     const quantity = parseFloat(e.detail.value) || 0;
     const selectedProducts = this.data.selectedProducts;
-    
+
     const updatedProducts = [...selectedProducts];
     const product = updatedProducts[index];
     const price = product.selectedUnit?.price || product.price || 0;
-    
+    const conversionRate = product.selectedUnit?.conversionRate || 1;
+
+    // 小计 = 默认单位价格 × 数量 × 转换系数
+    const subtotal = price * quantity * conversionRate;
+
     updatedProducts[index] = {
       ...updatedProducts[index],
       quantity: quantity,
-      subtotal: price * quantity
+      subtotal: parseFloat(subtotal.toFixed(2))
     };
-    
+
     this.setData({
       selectedProducts: updatedProducts
     });
-    
+
     this.calculateTotalAmount();
   },
 
@@ -295,19 +343,22 @@ Page({
     const selectedProducts = this.data.selectedProducts;
     const product = selectedProducts[index];
     const price = product.selectedUnit?.price || product.price || 0;
-    
+    const conversionRate = product.selectedUnit?.conversionRate || 1;
+
     const updatedProducts = [...selectedProducts];
     const newQuantity = parseFloat(((updatedProducts[index].quantity || 0) + 0.5).toFixed(1));
+    const subtotal = price * newQuantity * conversionRate;
+
     updatedProducts[index] = {
       ...updatedProducts[index],
       quantity: newQuantity,
-      subtotal: price * newQuantity
+      subtotal: parseFloat(subtotal.toFixed(2))
     };
-    
+
     this.setData({
       selectedProducts: updatedProducts
     });
-    
+
     this.calculateTotalAmount();
   },
 
@@ -316,20 +367,23 @@ Page({
     const selectedProducts = this.data.selectedProducts;
     const product = selectedProducts[index];
     const price = product.selectedUnit?.price || product.price || 0;
-    
+    const conversionRate = product.selectedUnit?.conversionRate || 1;
+
     const updatedProducts = [...selectedProducts];
     const currentQty = updatedProducts[index].quantity || 0;
     const newQuantity = parseFloat(Math.max(currentQty - 0.5, 0.1).toFixed(1));
+    const subtotal = price * newQuantity * conversionRate;
+
     updatedProducts[index] = {
       ...updatedProducts[index],
       quantity: newQuantity,
-      subtotal: price * newQuantity
+      subtotal: parseFloat(subtotal.toFixed(2))
     };
-    
+
     this.setData({
       selectedProducts: updatedProducts
     });
-    
+
     this.calculateTotalAmount();
   },
 
@@ -351,8 +405,8 @@ Page({
     let totalAmount = 0;
 
     selectedProducts.forEach(product => {
-      const price = product.selectedUnit?.price || product.price || 0;
-      totalAmount += price * (product.quantity || 0);
+      // 使用已计算好的小计
+      totalAmount += product.subtotal || 0;
     });
 
     this.setData({
@@ -386,6 +440,7 @@ Page({
 
     const updatedProducts = [...selectedProducts];
     const product = updatedProducts[index];
+    const conversionRate = product.selectedUnit?.conversionRate || 1;
 
     // 如果输入为空，保持为空，不自动填充默认价格
     let price;
@@ -397,6 +452,9 @@ Page({
       price = parseFloat(value) || 0;
     }
 
+    // 小计 = 默认单位价格 × 数量 × 转换系数
+    const subtotal = price * (product.quantity || 1) * conversionRate;
+
     updatedProducts[index] = {
       ...updatedProducts[index],
       selectedUnit: {
@@ -404,7 +462,7 @@ Page({
         price: parseFloat(price.toFixed(2))
       },
       inputPrice: inputPrice, // 如果是空输入，保持特殊标记
-      subtotal: parseFloat((price * (product.quantity || 1)).toFixed(2))
+      subtotal: parseFloat(subtotal.toFixed(2))
     };
 
     this.setData({
@@ -432,10 +490,9 @@ Page({
       return;
     }
 
-    // 计算总金额
+    // 使用已计算好的小计
     const calculatedTotalAmount = this.data.selectedProducts.reduce((sum, product) => {
-      const price = product.selectedUnit?.price || product.price || 0;
-      return sum + price * (product.quantity || 0);
+      return sum + (product.subtotal || 0);
     }, 0);
 
     const data = {
@@ -445,7 +502,7 @@ Page({
         productUnitId: p.selectedUnit?.id || null,
         quantity: p.quantity,
         price: p.selectedUnit?.price || p.price || 0,
-        totalAmount: (p.selectedUnit?.price || p.price || 0) * p.quantity
+        totalAmount: p.subtotal || 0
       })),
       totalAmount: calculatedTotalAmount,
       remark: this.data.remark,
@@ -484,10 +541,9 @@ Page({
       return;
     }
 
-    // 计算总金额
+    // 使用已计算好的小计
     const calculatedTotalAmount = this.data.selectedProducts.reduce((sum, product) => {
-      const price = product.selectedUnit?.price || product.price || 0;
-      return sum + price * (product.quantity || 0);
+      return sum + (product.subtotal || 0);
     }, 0);
 
     const data = {
@@ -497,7 +553,7 @@ Page({
         productUnitId: p.selectedUnit?.id || null,
         quantity: p.quantity,
         price: p.selectedUnit?.price || p.price || 0,
-        totalAmount: (p.selectedUnit?.price || p.price || 0) * p.quantity
+        totalAmount: p.subtotal || 0
       })),
       totalAmount: calculatedTotalAmount,
       remark: this.data.remark,

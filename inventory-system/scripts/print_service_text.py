@@ -137,8 +137,9 @@ def create_print_content(job):
     lines.append(f"|联系电话: {customer.get('phone', ''):<78}|")
     lines.append("-" * PAGE_WIDTH)
 
-    # 表头 - 只保留左右竖线 (序号6+名称18+单位8+规格10+数量8+单价10+金额18=78)
-    lines.append(f"|{pad_text('序号', 6, 'center')}{pad_text('商品名称', 22, 'center')}{pad_text('单位', 8, 'center')}{pad_text('规格', 10, 'center')}{pad_text('数量', 10, 'center')}{pad_text('单价', 14, 'center')}{pad_text('金额', 18, 'center')}|")
+    # 表头 - 只保留左右竖线 (序号6+名称22+数量18+规格10+单价14+金额18=88)
+    # 数量和单位合并为一列，格式：数量+单位
+    lines.append(f"|{pad_text('序号', 6, 'center')}{pad_text('商品名称', 22, 'center')}{pad_text('数量', 18, 'center')}{pad_text('规格', 10, 'center')}{pad_text('单价', 14, 'center')}{pad_text('金额', 18, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
 
     # ========== 商品明细 ==========
@@ -160,19 +161,25 @@ def create_print_content(job):
         price = float(item.get('price', 0))
         amount = float(item.get('totalAmount', 0))
 
+        # 数量和单位合并显示
+        qty_with_unit = f"{qty}{unit}"
+
         # 使用pad_text处理中英文混合对齐，只保留左右竖线
-        line = f"|{pad_text(idx, 6, 'center')}{pad_text(name, 22, 'center')}{pad_text(unit, 8, 'center')}{pad_text(specification, 10, 'center')}{pad_text(qty, 10, 'center')}{pad_text(f'{price:.2f}', 14, 'center')}{pad_text(f'{amount:.2f}', 18, 'center')}|"
+        line = f"|{pad_text(idx, 6, 'center')}{pad_text(name, 22, 'center')}{pad_text(qty_with_unit, 18, 'center')}{pad_text(specification, 10, 'center')}{pad_text(f'{price:.2f}', 14, 'center')}{pad_text(f'{amount:.2f}', 18, 'center')}|"
         lines.append(line)
+        # 商品之间添加虚线分割
+        lines.append(f"|{'-' * 6}{'-' * 22}{'-' * 18}{'-' * 10}{'-' * 14}{'-' * 18}|")
 
         total_amount += amount
 
     # 如果商品数据少于12行，补充空行至12行
     remaining_lines = 10 - total_items
     for i in range(max(0, remaining_lines)):
-        lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 8)}{pad_text('', 10)}{pad_text('', 10)}{pad_text('', 14)}{pad_text('', 18)}|")
+        lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 18)}{pad_text('', 10)}{pad_text('', 14)}{pad_text('', 18)}|")
+        # lines.append(f"|{'-' * 6}{'-' * 22}{'-' * 18}{'-' * 10}{'-' * 14}{'-' * 18}|")
 
     lines.append("-" * PAGE_WIDTH)
-    lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('', 8)}{pad_text('', 10)}{pad_text('合计', 10, 'center')}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 18, 'center')}|")
+    lines.append(f"|{pad_text('', 6)}{pad_text('', 22)}{pad_text('合计', 18, 'center')}{pad_text('', 10)}{pad_text(f'{total_items}种', 14, 'center')}{pad_text(f'{total_amount:.2f}', 18, 'center')}|")
     lines.append("-" * PAGE_WIDTH)
     lines.append("")
     lines.append(f"{left_text('服务电话: 15820159623', 60)}客户签名: ________________")

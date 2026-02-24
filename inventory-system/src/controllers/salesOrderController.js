@@ -113,11 +113,11 @@ exports.createSalesOrder = async (req, res) => {
     const processedProducts = await Promise.all(products.map(async (item) => {
       const productId = parseInt(item.productId);
       const quantity = parseFloat(item.quantity) || 0;
-      
+
       // 获取商品单位信息
       let unitPrice = parseFloat(item.price);
       let baseQuantity = quantity;  // 默认基本数量等于销售数量
-      
+
       if (item.productUnitId) {
         const unit = await prisma.productUnit.findUnique({
           where: { id: parseInt(item.productUnitId) }
@@ -129,7 +129,7 @@ exports.createSalesOrder = async (req, res) => {
           }
         }
       }
-      
+
       // 如果没有提供单价，尝试获取默认单位单价
       if (!unitPrice || isNaN(unitPrice)) {
         const defaultUnit = await prisma.productUnit.findFirst({
@@ -141,9 +141,10 @@ exports.createSalesOrder = async (req, res) => {
           unitPrice = 0;
         }
       }
-      
-      const totalAmount = unitPrice * quantity;
-      
+
+      // 使用前端传来的totalAmount，前端已经根据转换系数计算好了
+      const totalAmount = parseFloat(item.totalAmount) || (unitPrice * quantity);
+
       return {
         productId,
         productUnitId: item.productUnitId ? parseInt(item.productUnitId) : null,
@@ -286,7 +287,8 @@ exports.updateSalesOrder = async (req, res) => {
         }
       }
 
-      const totalAmount = unitPrice * quantity;
+      // 使用前端传来的totalAmount，前端已经根据转换系数计算好了
+      const totalAmount = parseFloat(item.totalAmount) || (unitPrice * quantity);
 
       return {
         productId,

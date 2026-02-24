@@ -72,9 +72,10 @@ Page({
     // 处理商品数据
     if (order.products && Array.isArray(order.products)) {
       order.products.forEach(product => {
-        // 计算小计金额
-        if (product.price && product.quantity) {
-          product.totalAmount = (parseFloat(product.price) * parseFloat(product.quantity)).toFixed(2);
+        // 使用后端返回的totalAmount，不再重新计算
+        // 后端已经根据转换系数计算好了正确的金额
+        if (product.totalAmount) {
+          product.totalAmount = parseFloat(product.totalAmount).toFixed(2);
         }
       });
     }
