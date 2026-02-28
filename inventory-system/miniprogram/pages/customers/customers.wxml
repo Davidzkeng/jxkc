@@ -1,18 +1,33 @@
 <view class="container">
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜索客户名称、联系人或电话" 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+        bindconfirm="onSearch"
+      />
+      <text wx:if="{{searchKeyword}}" class="clear-icon" bindtap="clearSearch">✕</text>
+    </view>
+  </view>
+
   <view wx:if="{{loading}}" class="loading">
     <text>加载中...</text>
   </view>
 
   <view wx:else>
-    <view wx:if="{{customers.length === 0}}" class="empty-state">
+    <view wx:if="{{filteredCustomers.length === 0}}" class="empty-state">
       <text class="empty-icon">👥</text>
-      <text>暂无客户</text>
+      <text>{{searchKeyword ? '未找到匹配客户' : '暂无客户'}}</text>
     </view>
 
     <view wx:else class="customer-list">
       <view
         class="customer-card"
-        wx:for="{{customers}}"
+        wx:for="{{filteredCustomers}}"
         wx:key="id"
       >
         <view class="customer-header">

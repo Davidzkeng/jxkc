@@ -148,6 +148,7 @@
                   bindblur="onPriceBlur"
                   data-index="{{index}}"
                 />
+                <text wx:if="{{item.isHistoryPrice}}" class="history-tag">历史</text>
               </view>
             </view>
             

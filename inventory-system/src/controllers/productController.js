@@ -1,5 +1,29 @@
 const prisma = require('../server/prisma');
 
+// 检查商品名称是否存在
+exports.checkName = async (req, res) => {
+  try {
+    const { name, excludeId } = req.query;
+    
+    if (!name) {
+      return res.json({ exists: false });
+    }
+    
+    const whereClause = { name };
+    if (excludeId) {
+      whereClause.id = { not: parseInt(excludeId) };
+    }
+    
+    const existingProduct = await prisma.product.findFirst({
+      where: whereClause
+    });
+    
+    res.json({ exists: !!existingProduct });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // 获取所有商品
 exports.getAllProducts = async (req, res) => {
   try {
@@ -44,6 +68,14 @@ exports.getProductById = async (req, res) => {
 exports.createProduct = async (req, res) => {
   try {
     const { name, code, categoryId, supplierId, price, stock, description } = req.body;
+    
+    // 检查商品名称是否已存在
+    const existingProduct = await prisma.product.findFirst({
+      where: { name }
+    });
+    if (existingProduct) {
+      return res.status(400).json({ error: '商品名称已存在' });
+    }
     
     // 创建商品
     const product = await prisma.product.create({
@@ -90,6 +122,18 @@ exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, code, categoryId, supplierId, price, stock, description } = req.body;
+    
+    // 检查商品名称是否已存在（排除自己）
+    const existingProduct = await prisma.product.findFirst({
+      where: { 
+        name,
+        id: { not: parseInt(id) }
+      }
+    });
+    if (existingProduct) {
+      return res.status(400).json({ error: '商品名称已存在' });
+    }
+    
     const product = await prisma.product.update({
       where: { id: parseInt(id) },
       data: { 

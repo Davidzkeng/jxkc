@@ -249,6 +249,63 @@ Page({
     // 如果没有单位，创建一个默认单位
     const selectedUnit = defaultUnit || { id: null, unitName: '斤', price: defaultPrice, conversionRate: 1 };
 
+    // 如果已选择客户，尝试获取历史价格
+    if (this.data.selectedCustomer && this.data.selectedCustomer.id) {
+      api.getHistoryPrice({
+        customerId: this.data.selectedCustomer.id,
+        productId: product.id
+      }).then(historyRes => {
+        let finalPrice = defaultPrice;
+        let finalUnit = selectedUnit;
+        let finalConversionRate = defaultConversionRate;
+
+        if (historyRes.found && historyRes.price !== null) {
+          finalPrice = parseFloat(historyRes.price);
+          // 如果历史记录有单位信息，尝试匹配
+          if (historyRes.productUnitId) {
+            const historyUnit = units.find(u => u.id === historyRes.productUnitId);
+            if (historyUnit) {
+              finalUnit = historyUnit;
+              finalConversionRate = parseFloat(historyUnit.conversionRate || 1);
+            }
+          }
+        }
+
+        // 小计 = 默认单位价格 × 数量 × 转换系数（默认单位转换系数为1）
+        const subtotal = finalPrice * 1 * finalConversionRate;
+
+        // 添加商品到已选列表
+        selectedProducts.push({
+          ...product,
+          units: units,
+          selectedUnit: {
+            ...finalUnit,
+            price: parseFloat(finalPrice.toFixed(2)),
+            conversionRate: finalConversionRate
+          },
+          quantity: 1,
+          subtotal: parseFloat(subtotal.toFixed(2)),
+          isHistoryPrice: historyRes.found
+        });
+
+        this.setData({
+          selectedProducts: selectedProducts,
+          showProductList: false,
+          productSearchKey: ''
+        });
+
+        this.calculateTotalAmount();
+      }).catch(err => {
+        console.error('获取历史价格失败', err);
+        this.addProductWithDefaultPrice(product, selectedProducts, units, selectedUnit, defaultPrice, defaultConversionRate);
+      });
+    } else {
+      // 没有选择客户，使用默认价格
+      this.addProductWithDefaultPrice(product, selectedProducts, units, selectedUnit, defaultPrice, defaultConversionRate);
+    }
+  },
+
+  addProductWithDefaultPrice(product, selectedProducts, units, selectedUnit, defaultPrice, defaultConversionRate) {
     // 小计 = 默认单位价格 × 数量 × 转换系数（默认单位转换系数为1）
     const subtotal = defaultPrice * 1 * defaultConversionRate;
 
@@ -262,7 +319,8 @@ Page({
         conversionRate: defaultConversionRate
       },
       quantity: 1,
-      subtotal: parseFloat(subtotal.toFixed(2))
+      subtotal: parseFloat(subtotal.toFixed(2)),
+      isHistoryPrice: false
     });
 
     this.setData({

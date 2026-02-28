@@ -3,6 +3,9 @@ const productController = require('../controllers/productController');
 
 const router = express.Router();
 
+// 检查商品名称是否存在
+router.get('/check-name', productController.checkName);
+
 // 获取库存统计（必须在 /:id 之前）
 router.get('/stats/stock', productController.getStockStats);
 

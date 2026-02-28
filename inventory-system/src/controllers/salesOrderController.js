@@ -1,5 +1,56 @@
 const prisma = require('../server/prisma');
 
+exports.getHistoryPrice = async (req, res) => {
+  try {
+    const { customerId, productId, productUnitId } = req.query;
+
+    if (!customerId || !productId) {
+      return res.status(400).json({ error: '缺少必要参数' });
+    }
+
+    const whereClause = {
+      customerId: parseInt(customerId),
+      status: { not: '已作废' },
+      products: {
+        some: {
+          productId: parseInt(productId)
+        }
+      }
+    };
+
+    if (productUnitId) {
+      whereClause.products.some.productUnitId = parseInt(productUnitId);
+    }
+
+    const orders = await prisma.salesOrder.findMany({
+      where: whereClause,
+      include: {
+        products: {
+          where: { productId: parseInt(productId) },
+          include: { productUnit: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 1
+    });
+
+    if (orders.length === 0 || orders[0].products.length === 0) {
+      return res.json({ found: false, price: null });
+    }
+
+    const lastProduct = orders[0].products[0];
+    res.json({
+      found: true,
+      price: lastProduct.price,
+      productUnitId: lastProduct.productUnitId,
+      unitName: lastProduct.productUnit?.unitName || '斤',
+      orderDate: orders[0].createdAt.toISOString().split('T')[0]
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // 获取所有销售单
 exports.getAllSalesOrders = async (req, res) => {
   try {

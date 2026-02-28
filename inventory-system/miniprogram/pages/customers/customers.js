@@ -4,6 +4,8 @@ const util = require('../../utils/util.js');
 Page({
   data: {
     customers: [],
+    filteredCustomers: [],
+    searchKeyword: '',
     loading: true
   },
 
@@ -19,8 +21,10 @@ Page({
     this.setData({ loading: true });
     api.getCustomers()
       .then(res => {
+        const customers = Array.isArray(res) ? res : [];
         this.setData({
-          customers: Array.isArray(res) ? res : [],
+          customers: customers,
+          filteredCustomers: customers,
           loading: false
         });
       })
@@ -29,6 +33,42 @@ Page({
         util.showError('加载失败');
         this.setData({ loading: false });
       });
+  },
+
+  onSearchInput(e) {
+    const keyword = e.detail.value;
+    this.setData({ searchKeyword: keyword });
+    this.filterCustomers(keyword);
+  },
+
+  onSearch(e) {
+    const keyword = e.detail.value;
+    this.setData({ searchKeyword: keyword });
+    this.filterCustomers(keyword);
+  },
+
+  clearSearch() {
+    this.setData({ 
+      searchKeyword: '',
+      filteredCustomers: this.data.customers 
+    });
+  },
+
+  filterCustomers(keyword) {
+    if (!keyword || keyword.trim() === '') {
+      this.setData({ filteredCustomers: this.data.customers });
+      return;
+    }
+    
+    const lowerKeyword = keyword.toLowerCase().trim();
+    const filtered = this.data.customers.filter(customer => {
+      const name = (customer.name || '').toLowerCase();
+      const contact = (customer.contact || '').toLowerCase();
+      const phone = (customer.phone || '').toLowerCase();
+      return name.includes(lowerKeyword) || contact.includes(lowerKeyword) || phone.includes(lowerKeyword);
+    });
+    
+    this.setData({ filteredCustomers: filtered });
   },
 
   navigateToAdd() {

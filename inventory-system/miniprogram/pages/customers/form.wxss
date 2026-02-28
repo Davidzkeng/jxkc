@@ -30,6 +30,19 @@
   color: #333;
 }
 
+.form-input.error {
+  border: 1rpx solid #ff4d4f;
+  border-radius: 8rpx;
+  padding: 0 16rpx;
+}
+
+.error-text {
+  display: block;
+  font-size: 24rpx;
+  color: #ff4d4f;
+  margin-top: 8rpx;
+}
+
 .form-textarea {
   width: 100%;
   min-height: 160rpx;

@@ -6,7 +6,8 @@
   <view wx:else class="form">
     <view class="form-item">
       <text class="form-label">客户名称 *</text>
-      <input class="form-input" value="{{name}}" bindinput="onNameChange" placeholder="请输入客户名称" />
+      <input class="form-input {{nameError ? 'error' : ''}}" value="{{name}}" bindinput="onNameChange" bindblur="onNameBlur" placeholder="请输入客户名称" />
+      <text wx:if="{{nameError}}" class="error-text">{{nameError}}</text>
     </view>
 
     <view class="form-item">

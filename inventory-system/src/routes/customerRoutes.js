@@ -3,6 +3,9 @@ const customerController = require('../controllers/customerController');
 
 const router = express.Router();
 
+// 检查客户名称是否存在
+router.get('/check-name', customerController.checkName);
+
 // 获取所有客户
 router.get('/', customerController.getAllCustomers);
 

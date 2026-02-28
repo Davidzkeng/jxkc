@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const salesOrderController = require('../controllers/salesOrderController');
 
+// 获取客户商品历史价格
+router.get('/history-price', salesOrderController.getHistoryPrice);
+
 // 获取所有销售单
 router.get('/', salesOrderController.getAllSalesOrders);
 

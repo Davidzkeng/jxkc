@@ -15,6 +15,7 @@ Page({
     description: '',
     categories: [],
     suppliers: [],
+    nameError: '',
     loading: false,
     submitLoading: false
   },
@@ -133,7 +134,47 @@ Page({
   },
 
   onNameChange(e) {
-    this.setData({ name: e.detail.value });
+    const name = e.detail.value;
+    this.setData({ name, nameError: '' });
+    
+    if (name.trim()) {
+      this.checkNameDebounced(name);
+    }
+  },
+
+  onNameBlur() {
+    if (this.data.name.trim()) {
+      this.checkName(this.data.name);
+    }
+  },
+
+  checkNameDebounced: (function() {
+    let timer = null;
+    return function(name) {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        this.checkName(name);
+      }, 500);
+    };
+  })(),
+
+  checkName(name) {
+    const params = { name };
+    if (this.data.id) {
+      params.excludeId = this.data.id;
+    }
+    
+    api.checkProductName(params)
+      .then(res => {
+        if (res.exists) {
+          this.setData({ nameError: '商品名称已存在' });
+        } else {
+          this.setData({ nameError: '' });
+        }
+      })
+      .catch(err => {
+        console.error('检查商品名称失败', err);
+      });
   },
 
   onCodeChange(e) {
@@ -172,6 +213,11 @@ Page({
 
   submit() {
     console.log('提交数据', this.data);
+
+    if (this.data.nameError) {
+      util.showError('请先修正商品名称');
+      return;
+    }
 
     if (!this.data.name.trim()) {
       util.showError('请输入商品名称');
@@ -230,7 +276,8 @@ Page({
       })
       .catch(err => {
         console.error('保存商品失败', err);
-        util.showError('保存失败');
+        const errorMsg = err.data?.error || '保存失败';
+        util.showError(errorMsg);
         this.setData({ submitLoading: false });
       });
   }

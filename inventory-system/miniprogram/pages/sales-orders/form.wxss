@@ -296,6 +296,15 @@
   line-height: 56rpx;
 }
 
+.history-tag {
+  font-size: 20rpx;
+  color: #52c41a;
+  background: #f6ffed;
+  padding: 2rpx 8rpx;
+  border-radius: 4rpx;
+  margin-left: 8rpx;
+}
+
 /* 数量行 */
 .quantity-row {
   display: flex;
