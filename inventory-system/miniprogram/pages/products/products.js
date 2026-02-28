@@ -14,10 +14,10 @@ Page({
   },
 
   onShow() {
-    this.loadProducts();
+    this.loadProducts(true);
   },
 
-  loadProducts() {
+  loadProducts(keepSearch = false) {
     console.log("ttttttttt");
     this.setData({ loading: true });
     api.getProducts()
@@ -25,9 +25,13 @@ Page({
         const products = Array.isArray(res) ? res : [];
         this.setData({
           products: products,
-          filteredProducts: products,
           loading: false
         });
+        if (keepSearch && this.data.searchKeyword) {
+          this.filterProducts(this.data.searchKeyword);
+        } else {
+          this.setData({ filteredProducts: products });
+        }
       })
       .catch(err => {
         console.error('加载商品列表失败', err);
