@@ -1,18 +1,33 @@
 <view class="container">
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="搜索商品名称或编码" 
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        confirm-type="search"
+        bindconfirm="onSearch"
+      />
+      <text wx:if="{{searchKeyword}}" class="clear-icon" bindtap="clearSearch">✕</text>
+    </view>
+  </view>
+
   <view wx:if="{{loading}}" class="loading">
     <text>加载中...</text>
   </view>
 
   <view wx:else>
-    <view wx:if="{{products.length === 0}}" class="empty-state">
+    <view wx:if="{{filteredProducts.length === 0}}" class="empty-state">
       <text class="empty-icon">📦</text>
-      <text>暂无商品</text>
+      <text>{{searchKeyword ? '未找到匹配商品' : '暂无商品'}}</text>
     </view>
 
     <view wx:else class="product-list">
       <view
         class="product-card"
-        wx:for="{{products}}"
+        wx:for="{{filteredProducts}}"
         wx:key="id"
       >
         <view class="product-header" bindtap="viewDetail" data-id="{{item.id}}">

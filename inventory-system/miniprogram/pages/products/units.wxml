@@ -21,6 +21,7 @@
           <text class="default-tag" wx:if="{{item.isDefault}}">默认</text>
         </view>
         <view class="unit-actions">
+          <button size="mini" type="default" bindtap="editUnit" data-id="{{item.id}}">编辑</button>
           <button wx:if="{{!item.isDefault}}" size="mini" type="primary" bindtap="setDefault" data-id="{{item.id}}">设为默认</button>
           <button wx:if="{{units.length > 1}}" size="mini" type="warn" bindtap="deleteUnit" data-id="{{item.id}}">删除</button>
         </view>
@@ -34,8 +35,9 @@
     <!-- 添加单位按钮 -->
     <button class="add-btn" bindtap="toggleAddForm" wx:if="{{!showAddForm}}">+ 添加销售单位</button>
 
-    <!-- 添加单位表单 -->
+    <!-- 添加/编辑单位表单 -->
     <view class="add-form" wx:if="{{showAddForm}}">
+      <view class="form-title">{{editingUnitId ? '编辑单位' : '添加单位'}}</view>
       <view class="form-item">
         <text class="form-label">单位名称</text>
         <input class="form-input" placeholder="如：斤、件、箱、盒" value="{{unitName}}" bindinput="onUnitNameChange" />

@@ -7,6 +7,7 @@ Page({
     productName: '',
     units: [],
     showAddForm: false,
+    editingUnitId: null,
     unitName: '',
     specification: '',
     conversionRate: '1',
@@ -50,11 +51,28 @@ Page({
   toggleAddForm() {
     this.setData({
       showAddForm: !this.data.showAddForm,
+      editingUnitId: null,
       unitName: '',
       specification: '',
       conversionRate: '1',
       unitPrice: '',
       isDefault: this.data.units.length === 0
+    });
+  },
+
+  editUnit(e) {
+    const unitId = e.currentTarget.dataset.id;
+    const unit = this.data.units.find(u => u.id === unitId);
+    if (!unit) return;
+
+    this.setData({
+      showAddForm: true,
+      editingUnitId: unitId,
+      unitName: unit.unitName || '',
+      specification: unit.specification || '',
+      conversionRate: String(unit.conversionRate || '1'),
+      unitPrice: String(unit.price || ''),
+      isDefault: unit.isDefault || false
     });
   },
 
@@ -106,17 +124,32 @@ Page({
     };
 
     this.setData({ submitLoading: true });
-    api.createProductUnit(data)
-      .then(() => {
-        util.showSuccess('添加成功');
-        this.setData({ showAddForm: false });
-        this.loadUnits();
-      })
-      .catch(err => {
-        console.error('添加商品单位失败', err);
-        util.showError(err.data?.error || '添加失败');
-        this.setData({ submitLoading: false });
-      });
+
+    if (this.data.editingUnitId) {
+      api.updateProductUnit(this.data.editingUnitId, data)
+        .then(() => {
+          util.showSuccess('更新成功');
+          this.setData({ showAddForm: false, editingUnitId: null });
+          this.loadUnits();
+        })
+        .catch(err => {
+          console.error('更新商品单位失败', err);
+          util.showError(err.data?.error || '更新失败');
+          this.setData({ submitLoading: false });
+        });
+    } else {
+      api.createProductUnit(data)
+        .then(() => {
+          util.showSuccess('添加成功');
+          this.setData({ showAddForm: false });
+          this.loadUnits();
+        })
+        .catch(err => {
+          console.error('添加商品单位失败', err);
+          util.showError(err.data?.error || '添加失败');
+          this.setData({ submitLoading: false });
+        });
+    }
   },
 
   setDefault(e) {

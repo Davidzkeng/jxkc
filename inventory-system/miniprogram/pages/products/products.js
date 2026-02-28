@@ -4,6 +4,8 @@ const util = require('../../utils/util.js');
 Page({
   data: {
     products: [],
+    filteredProducts: [],
+    searchKeyword: '',
     loading: true
   },
 
@@ -20,8 +22,10 @@ Page({
     this.setData({ loading: true });
     api.getProducts()
       .then(res => {
+        const products = Array.isArray(res) ? res : [];
         this.setData({
-          products: Array.isArray(res) ? res : [],
+          products: products,
+          filteredProducts: products,
           loading: false
         });
       })
@@ -30,6 +34,41 @@ Page({
         util.showError('加载失败');
         this.setData({ loading: false });
       });
+  },
+
+  onSearchInput(e) {
+    const keyword = e.detail.value;
+    this.setData({ searchKeyword: keyword });
+    this.filterProducts(keyword);
+  },
+
+  onSearch(e) {
+    const keyword = e.detail.value;
+    this.setData({ searchKeyword: keyword });
+    this.filterProducts(keyword);
+  },
+
+  clearSearch() {
+    this.setData({ 
+      searchKeyword: '',
+      filteredProducts: this.data.products 
+    });
+  },
+
+  filterProducts(keyword) {
+    if (!keyword || keyword.trim() === '') {
+      this.setData({ filteredProducts: this.data.products });
+      return;
+    }
+    
+    const lowerKeyword = keyword.toLowerCase().trim();
+    const filtered = this.data.products.filter(product => {
+      const name = (product.name || '').toLowerCase();
+      const code = (product.code || '').toLowerCase();
+      return name.includes(lowerKeyword) || code.includes(lowerKeyword);
+    });
+    
+    this.setData({ filteredProducts: filtered });
   },
 
   navigateToAdd() {
