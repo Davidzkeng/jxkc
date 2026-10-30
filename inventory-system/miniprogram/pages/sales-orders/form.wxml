@@ -160,8 +160,8 @@
                 <input 
                   class="quantity-input" 
                   type="digit" 
-                  value="{{item.quantity}}" 
-                  bindinput="onQuantityChange" 
+                  value="{{item.quantityInput}}" 
+                  bindinput="onQuantityInput" 
                   data-index="{{index}}"
                 />
                 <text class="quantity-btn plus" bindtap="increaseQuantity" data-index="{{index}}">+</text>

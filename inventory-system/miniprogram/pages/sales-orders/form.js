@@ -82,6 +82,7 @@ Page({
             code: p.code,
             price: p.price,
             quantity: p.quantity,
+            quantityInput: String(p.quantity),
             units: units,
             selectedUnit: {
               id: p.productUnitId,
@@ -284,6 +285,7 @@ Page({
             conversionRate: finalConversionRate
           },
           quantity: 1,
+          quantityInput: '1',
           subtotal: parseFloat(subtotal.toFixed(2)),
           isHistoryPrice: historyRes.found
         });
@@ -319,6 +321,7 @@ Page({
         conversionRate: defaultConversionRate
       },
       quantity: 1,
+      quantityInput: '1',
       subtotal: parseFloat(subtotal.toFixed(2)),
       isHistoryPrice: false
     });
@@ -370,9 +373,10 @@ Page({
     this.calculateTotalAmount();
   },
 
-  onQuantityChange(e) {
+  onQuantityInput(e) {
     const index = e.currentTarget.dataset.index;
-    const quantity = parseFloat(e.detail.value) || 0;
+    const raw = e.detail.value;                    // 保留原始输入，如 "1." / "1.5"
+    const quantity = parseFloat(raw) || 0;
     const selectedProducts = this.data.selectedProducts;
 
     const updatedProducts = [...selectedProducts];
@@ -385,7 +389,8 @@ Page({
 
     updatedProducts[index] = {
       ...updatedProducts[index],
-      quantity: quantity,
+      quantityInput: raw,      // 输入框显示用原始字符串
+      quantity: quantity,      // 计算/提交用数值
       subtotal: parseFloat(subtotal.toFixed(2))
     };
 
@@ -410,6 +415,7 @@ Page({
     updatedProducts[index] = {
       ...updatedProducts[index],
       quantity: newQuantity,
+      quantityInput: String(newQuantity),
       subtotal: parseFloat(subtotal.toFixed(2))
     };
 
@@ -435,6 +441,7 @@ Page({
     updatedProducts[index] = {
       ...updatedProducts[index],
       quantity: newQuantity,
+      quantityInput: String(newQuantity),
       subtotal: parseFloat(subtotal.toFixed(2))
     };
 

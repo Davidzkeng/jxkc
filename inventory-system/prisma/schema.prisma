@@ -154,7 +154,7 @@ model SalesOrderProduct {
   product       Product    @relation(fields: [productId], references: [id])
   productUnitId Int?       // 可选，关联商品单位
   productUnit   ProductUnit? @relation(fields: [productUnitId], references: [id])
-  quantity      Int        // 销售数量
+  quantity      Float      // 销售数量（支持小数，如 1.5 斤）
   baseQuantity  Float      @default(0) // 基本单位数量（转换后）
   price         Decimal    @default(0) // 单价
   totalAmount   Decimal    @default(0.00) // 小计金额

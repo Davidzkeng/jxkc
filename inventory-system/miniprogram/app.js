@@ -2,8 +2,8 @@
 App({
   globalData: {
     // API基础URL，请根据实际情况修改
-    baseUrl: 'http://localhost:3001/api',
-    // baseUrl: 'https://store.dove521.cn/api',
+    // baseUrl: 'http://localhost:3001/api',
+    baseUrl: 'https://store.dove521.cn/api',
     userInfo: null
   },
 
