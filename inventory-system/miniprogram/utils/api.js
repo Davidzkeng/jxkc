@@ -117,7 +117,7 @@ module.exports = {
   deleteOutRecord: (id) => request({ url: `/out-records/${id}`, method: 'DELETE' }),
 
   // 销售单相关API
-  getSalesOrders: () => request({ url: '/sales-orders', method: 'GET' }),
+  getSalesOrders: (params) => request({ url: '/sales-orders', method: 'GET', data: params, needLoading: false }),
   getSalesOrderById: (id) => request({ url: `/sales-orders/${id}`, method: 'GET' }),
   createSalesOrder: (data) => request({ url: '/sales-orders', method: 'POST', data }),
   updateSalesOrder: (id, data) => request({ url: `/sales-orders/${id}`, method: 'PUT', data }),

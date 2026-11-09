@@ -54,20 +54,29 @@ exports.getHistoryPrice = async (req, res) => {
 // 获取所有销售单
 exports.getAllSalesOrders = async (req, res) => {
   try {
-    const salesOrders = await prisma.salesOrder.findMany({
-      include: {
-        customer: true,
-        products: {
-          include: {
-            product: true,
-            productUnit: true
+    // 分页参数：page 从 1 开始，pageSize 限制在 1~100
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const pageSize = Math.min(100, Math.max(1, parseInt(req.query.pageSize, 10) || 20));
+
+    const [salesOrders, total] = await Promise.all([
+      prisma.salesOrder.findMany({
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          customer: true,
+          products: {
+            include: {
+              product: true,
+              productUnit: true
+            }
           }
+        },
+        orderBy: {
+          createdAt: 'desc'
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
+      }),
+      prisma.salesOrder.count()
+    ]);
 
     // 格式化返回数据
     const formattedOrders = salesOrders.map(order => ({
@@ -94,7 +103,13 @@ exports.getAllSalesOrders = async (req, res) => {
       }))
     }));
 
-    res.json(formattedOrders);
+    res.json({
+      list: formattedOrders,
+      total,
+      page,
+      pageSize,
+      totalPages: Math.ceil(total / pageSize)
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
