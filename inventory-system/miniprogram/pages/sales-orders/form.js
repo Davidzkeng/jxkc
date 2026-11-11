@@ -27,7 +27,10 @@ Page({
 
     // 编辑模式
     isEditMode: false,
-    editOrderId: null
+    editOrderId: null,
+
+    // 复制模式（作废后重新编辑，保存时生成新单）
+    copyFromOrderId: null
   },
 
   onLoad(options) {
@@ -40,15 +43,22 @@ Page({
         editOrderId: parseInt(options.id)
       });
       this.loadOrderData(parseInt(options.id));
+    } else if (options.id && options.mode === 'copy') {
+      // 复制模式：预填原单内容，保存时创建新单
+      this.setData({
+        copyFromOrderId: parseInt(options.id)
+      });
+      this.loadOrderData(parseInt(options.id));
     }
   },
 
-  // 加载销售单数据（编辑模式）
+  // 加载销售单数据（编辑/复制模式）
   loadOrderData(orderId) {
     this.setData({ loading: true });
     Promise.all([api.getSalesOrderById(orderId), api.getProducts()])
       .then(([res, productsRes]) => {
-        if (res.status !== '草稿') {
+        // 复制模式（作废后重新编辑）允许任意状态；编辑模式仍仅限草稿
+        if (!this.data.copyFromOrderId && res.status !== '草稿') {
           util.showError('只有草稿状态可以编辑');
           wx.navigateBack();
           return;
@@ -56,8 +66,10 @@ Page({
 
         const products = Array.isArray(productsRes) ? productsRes : [];
 
-        // 设置客户
-        const customer = this.data.customers.find(c => c.name === res.customerName);
+        // 设置客户（优先按 customerId 匹配，避免匹配不到时丢失 id）
+        const customer = this.data.customers.find(c => c.id === res.customerId)
+          || this.data.customers.find(c => c.name === res.customerName)
+          || { id: res.customerId, name: res.customerName };
 
         // 设置商品 - 从商品列表中获取完整信息
         const selectedProducts = res.products.map(p => {
@@ -97,7 +109,7 @@ Page({
         });
 
         this.setData({
-          selectedCustomer: customer || { name: res.customerName },
+          selectedCustomer: customer,
           selectedProducts: selectedProducts,
           remark: res.remark || '',
           loading: false

@@ -92,5 +92,23 @@ Page({
     wx.navigateTo({
       url: `/pages/sales-orders/form?id=${order.id}&mode=edit`
     });
+  },
+
+  // 已作废销售单：复制内容重新编辑（生成新单）
+  reEditOrder() {
+    const order = this.data.order;
+    if (!order) {
+      util.showError('销售单信息未加载');
+      return;
+    }
+
+    if (order.status !== '已作废') {
+      util.showError('只有已作废的销售单可以重新编辑');
+      return;
+    }
+
+    wx.navigateTo({
+      url: `/pages/sales-orders/form?id=${order.id}&mode=copy`
+    });
   }
 });

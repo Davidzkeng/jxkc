@@ -73,6 +73,9 @@
       <button wx:if="{{order.status !== '已作废' && order.status !== '草稿'}}" class="action-btn void-btn" bindtap="voidOrder">
         作废
       </button>
+      <button wx:if="{{order.status === '已作废'}}" class="action-btn edit-btn" bindtap="reEditOrder">
+        重新编辑
+      </button>
       <button wx:if="{{order.status !== '草稿'}}" class="action-btn print-btn" bindtap="printOrder">
         <text class="btn-icon">🖨️</text>
         <text class="btn-text">打印</text>

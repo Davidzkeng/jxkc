@@ -140,6 +140,7 @@ exports.getSalesOrderById = async (req, res) => {
     const formattedOrder = {
       id: salesOrder.id,
       orderNumber: salesOrder.orderNumber,
+      customerId: salesOrder.customerId,
       customerName: salesOrder.customer.name,
       customerContact: salesOrder.customer.contact,
       customerPhone: salesOrder.customer.phone,
