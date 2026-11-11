@@ -77,29 +77,28 @@ Page({
           const product = products.find(prod => prod.id === p.id) || {};
           const units = product.productUnits || [];
 
-          // 获取默认单位价格（价格始终显示默认单位的价格）
-          const defaultUnit = units.find(u => u.isDefault) || units[0];
-          const defaultPrice = parseFloat(defaultUnit?.price || product.price || 0);
-
           // 找到当前选中的单位及其转换系数
           const currentUnit = units.find(u => u.id === p.productUnitId);
           const currentConversionRate = parseFloat(currentUnit?.conversionRate || 1);
 
-          // 小计 = 默认单位价格 × 数量 × 转换系数
-          const subtotal = defaultPrice * p.quantity * currentConversionRate;
+          // 单价取【原单实际单价】（接口 Decimal 字段是字符串，需 parseFloat）
+          const linePrice = parseFloat(p.price) || 0;
+
+          // 小计 = 原单单价 × 数量 × 转换系数
+          const subtotal = linePrice * p.quantity * currentConversionRate;
 
           return {
             id: p.id,
             name: p.name,
             code: p.code,
-            price: p.price,
+            price: linePrice,
             quantity: p.quantity,
             quantityInput: String(p.quantity),
             units: units,
             selectedUnit: {
               id: p.productUnitId,
               unitName: p.unitName,
-              price: parseFloat(defaultPrice.toFixed(2)),
+              price: parseFloat(linePrice.toFixed(2)),
               conversionRate: currentConversionRate
             },
             productUnits: units,
